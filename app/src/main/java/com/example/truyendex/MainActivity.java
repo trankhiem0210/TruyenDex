@@ -10,8 +10,7 @@ import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
-    private TextView btnMenu, btnLogin, btnClose;
-    private LinearLayout noticeBox;
+    private TextView btnMenu, btnLogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,13 +20,6 @@ public class MainActivity extends Activity {
 
         btnMenu = findViewById(R.id.btnMenu);
         btnLogin = findViewById(R.id.btnLogin);
-        btnClose = findViewById(R.id.btnClose);
-        noticeBox = findViewById(R.id.noticeBox);
-
-        // Đóng thông báo
-        btnClose.setOnClickListener(v -> {
-            noticeBox.setVisibility(View.GONE);
-        });
 
         // Menu
         btnMenu.setOnClickListener(v -> {
