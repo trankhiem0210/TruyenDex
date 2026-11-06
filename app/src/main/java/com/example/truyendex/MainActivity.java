@@ -2,41 +2,43 @@
 package com.example.truyendex;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.TextView;
-import android.widget.LinearLayout;
 import android.widget.Toast;
+
+import com.example.truyendex.core.WindowInsetsHelper;
+import com.example.truyendex.data.repository.AuthRepository;
+import com.example.truyendex.features.account.AccountActivity;
+import com.example.truyendex.features.auth.LoginActivity;
 
 public class MainActivity extends Activity {
 
-    private TextView btnMenu, btnLogin;
+    private final AuthRepository authRepository = new AuthRepository();
+    private TextView btnLogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if (authRepository.getCurrentUser() == null) {
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+            return;
+        }
+
         setContentView(R.layout.activity_main);
+        WindowInsetsHelper.applySystemBarsPadding(findViewById(R.id.mainRoot));
 
-        btnMenu = findViewById(R.id.btnMenu);
-        btnLogin = findViewById(R.id.btnLogin);
+        TextView btnMenu = findViewById(R.id.btnMenu);
+        btnLogin = findViewById(R.id.txtLogin);
+        btnLogin.setText("Tài khoản");
 
-        // Menu
         btnMenu.setOnClickListener(v -> {
-            Toast.makeText(
-                    this,
-                    "Mở menu",
-                    Toast.LENGTH_SHORT
-            ).show();
+            Toast.makeText(this, "Mở menu", Toast.LENGTH_SHORT).show();
         });
 
-        // Đăng nhập
-        btnLogin.setOnClickListener(v -> {
-            Toast.makeText(
-                    this,
-                    "Đăng nhập",
-                    Toast.LENGTH_SHORT
-            ).show();
-        });
+        btnLogin.setOnClickListener(v ->
+                startActivity(new Intent(this, AccountActivity.class)));
     }
 }
