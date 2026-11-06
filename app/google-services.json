@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "340084747083",
+    "project_id": "truyendex-3d572",
+    "storage_bucket": "truyendex-3d572.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:340084747083:android:48c16aff578f40b91b96ce",
+        "android_client_info": {
+          "package_name": "com.example.truyendex"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDtY8k9sXHJwVLThrN6vGdJWlzBFk-P1u4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
