@@ -1,6 +1,7 @@
 package com.example.truyendex.data.repository;
 
 import com.google.firebase.FirebaseNetworkException;
+import com.google.firebase.FirebaseTooManyRequestsException;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
@@ -30,6 +31,29 @@ public class AuthRepository {
         return firebaseAuth.signInWithEmailAndPassword(email, password);
     }
 
+    public Task<Void> sendEmailVerification() {
+        FirebaseUser user = getCurrentUser();
+        if (user == null) {
+            return com.google.android.gms.tasks.Tasks.forException(
+                    new IllegalStateException("No signed-in user to verify."));
+        }
+        return user.sendEmailVerification();
+    }
+
+    public Task<Void> reloadCurrentUser() {
+        FirebaseUser user = getCurrentUser();
+        if (user == null) {
+            return com.google.android.gms.tasks.Tasks.forException(
+                    new IllegalStateException("No signed-in user to reload."));
+        }
+        return user.reload();
+    }
+
+    public boolean isEmailVerified() {
+        FirebaseUser user = getCurrentUser();
+        return user != null && user.isEmailVerified();
+    }
+
     public Task<Void> sendPasswordResetEmail(String email) {
         return firebaseAuth.sendPasswordResetEmail(email);
     }
@@ -51,6 +75,9 @@ public class AuthRepository {
         }
         if (exception instanceof FirebaseNetworkException) {
             return "Không có kết nối mạng. Vui lòng thử lại.";
+        }
+        if (exception instanceof FirebaseTooManyRequestsException) {
+            return "Bạn đã thử quá nhiều lần. Vui lòng đợi rồi thử lại.";
         }
         return "Không thể hoàn tất yêu cầu. Vui lòng thử lại sau.";
     }

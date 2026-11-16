@@ -21,7 +21,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (authRepository.getCurrentUser() == null) {
+        if (authRepository.getCurrentUser() == null || !authRepository.isEmailVerified()) {
             startActivity(new Intent(this, LoginActivity.class));
             finish();
             return;
