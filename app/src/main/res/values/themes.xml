@@ -1,9 +1,103 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.TruyenDex" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.TruyenDex.Light" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">?attr/colorBrand</item>
+        <item name="colorOnPrimary">?attr/colorOnBrand</item>
+        <item name="colorPrimaryContainer">?attr/colorSoft</item>
+        <item name="colorOnPrimaryContainer">?attr/colorInk</item>
+        <item name="colorSecondary">?attr/colorBrand</item>
+        <item name="colorOnSecondary">?attr/colorOnBrand</item>
+        <item name="colorSecondaryContainer">?attr/colorSoft</item>
+        <item name="colorOnSecondaryContainer">?attr/colorBrand</item>
+        <item name="colorSurfaceContainerLow">?attr/colorSurface</item>
+        <item name="colorSurfaceContainer">?attr/colorSubtle</item>
+        <item name="colorSurfaceContainerHigh">?attr/colorSubtle</item>
+        <item name="colorSurfaceVariant">?attr/colorSubtle</item>
+        <item name="colorOnSurface">?attr/colorInk</item>
+        <item name="colorOnSurfaceVariant">?attr/colorMuted</item>
+        <item name="colorOutline">?attr/colorLine</item>
+        <item name="android:colorBackground">?attr/colorBg</item>
+        <item name="android:statusBarColor">?attr/colorSurface</item>
+        <item name="android:navigationBarColor">?attr/colorSurface</item>
+        <item name="android:forceDarkAllowed">false</item>
+        <item name="colorBg">#F8FAF9</item>
+        <item name="colorSurface">#FFFFFF</item>
+        <item name="colorSubtle">#EDF2EF</item>
+        <item name="colorInk">#19251F</item>
+        <item name="colorMuted">#52635A</item>
+        <item name="colorLine">#D5DFD8</item>
+        <item name="colorBrand">#21654E</item>
+        <item name="colorOnBrand">#FFFFFF</item>
+        <item name="colorSoft">#DDEFE5</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
     </style>
 
-    <style name="Theme.TruyenDex" parent="Base.Theme.TruyenDex" />
+    <style name="Theme.TruyenDex.Dark" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">?attr/colorBrand</item>
+        <item name="colorOnPrimary">?attr/colorOnBrand</item>
+        <item name="colorPrimaryContainer">?attr/colorSoft</item>
+        <item name="colorOnPrimaryContainer">?attr/colorInk</item>
+        <item name="colorSecondary">?attr/colorBrand</item>
+        <item name="colorOnSecondary">?attr/colorOnBrand</item>
+        <item name="colorSecondaryContainer">?attr/colorSoft</item>
+        <item name="colorOnSecondaryContainer">?attr/colorBrand</item>
+        <item name="colorSurfaceContainerLow">?attr/colorSurface</item>
+        <item name="colorSurfaceContainer">?attr/colorSubtle</item>
+        <item name="colorSurfaceContainerHigh">?attr/colorSubtle</item>
+        <item name="colorSurfaceVariant">?attr/colorSubtle</item>
+        <item name="colorOnSurface">?attr/colorInk</item>
+        <item name="colorOnSurfaceVariant">?attr/colorMuted</item>
+        <item name="colorOutline">?attr/colorLine</item>
+        <item name="android:colorBackground">?attr/colorBg</item>
+        <item name="android:statusBarColor">?attr/colorSurface</item>
+        <item name="android:navigationBarColor">?attr/colorSurface</item>
+        <item name="android:forceDarkAllowed">false</item>
+        <item name="colorBg">#121715</item>
+        <item name="colorSurface">#1B2420</item>
+        <item name="colorSubtle">#25312B</item>
+        <item name="colorInk">#E7EEE9</item>
+        <item name="colorMuted">#A7B8AD</item>
+        <item name="colorLine">#3B4B41</item>
+        <item name="colorBrand">#96D5B4</item>
+        <item name="colorOnBrand">#102B1D</item>
+        <item name="colorSoft">#253F31</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+    </style>
+
+    <style name="Theme.TruyenDex.Sepia" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">?attr/colorBrand</item>
+        <item name="colorOnPrimary">?attr/colorOnBrand</item>
+        <item name="colorPrimaryContainer">?attr/colorSoft</item>
+        <item name="colorOnPrimaryContainer">?attr/colorInk</item>
+        <item name="colorSecondary">?attr/colorBrand</item>
+        <item name="colorOnSecondary">?attr/colorOnBrand</item>
+        <item name="colorSecondaryContainer">?attr/colorSoft</item>
+        <item name="colorOnSecondaryContainer">?attr/colorBrand</item>
+        <item name="colorSurfaceContainerLow">?attr/colorSurface</item>
+        <item name="colorSurfaceContainer">?attr/colorSubtle</item>
+        <item name="colorSurfaceContainerHigh">?attr/colorSubtle</item>
+        <item name="colorSurfaceVariant">?attr/colorSubtle</item>
+        <item name="colorOnSurface">?attr/colorInk</item>
+        <item name="colorOnSurfaceVariant">?attr/colorMuted</item>
+        <item name="colorOutline">?attr/colorLine</item>
+        <item name="android:colorBackground">?attr/colorBg</item>
+        <item name="android:statusBarColor">?attr/colorSurface</item>
+        <item name="android:navigationBarColor">?attr/colorSurface</item>
+        <item name="android:forceDarkAllowed">false</item>
+        <item name="colorBg">#F5EBDD</item>
+        <item name="colorSurface">#FFF7EB</item>
+        <item name="colorSubtle">#EADCC8</item>
+        <item name="colorInk">#3D3025</item>
+        <item name="colorMuted">#71604C</item>
+        <item name="colorLine">#D8C5AA</item>
+        <item name="colorBrand">#735330</item>
+        <item name="colorOnBrand">#FFFFFF</item>
+        <item name="colorSoft">#E9D7BD</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
+    </style>
+
+    <style name="Theme.TruyenDex" parent="Theme.TruyenDex.Light" />
 </resources>

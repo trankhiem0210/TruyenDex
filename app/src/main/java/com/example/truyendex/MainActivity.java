@@ -1,24 +1,26 @@
 
 package com.example.truyendex;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.TextView;
-import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.navigation.fragment.NavHostFragment;
+import androidx.navigation.ui.NavigationUI;
+
+import com.example.truyendex.core.ThemeManager;
 import com.example.truyendex.core.WindowInsetsHelper;
 import com.example.truyendex.data.repository.AuthRepository;
-import com.example.truyendex.features.account.AccountActivity;
 import com.example.truyendex.features.auth.LoginActivity;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
 
     private final AuthRepository authRepository = new AuthRepository();
-    private TextView btnLogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        ThemeManager.applyTheme(this);
         super.onCreate(savedInstanceState);
 
         if (authRepository.getCurrentUser() == null) {
@@ -30,15 +32,9 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         WindowInsetsHelper.applySystemBarsPadding(findViewById(R.id.mainRoot));
 
-        TextView btnMenu = findViewById(R.id.btnMenu);
-        btnLogin = findViewById(R.id.txtLogin);
-        btnLogin.setText("Tài khoản");
-
-        btnMenu.setOnClickListener(v -> {
-            Toast.makeText(this, "Mở menu", Toast.LENGTH_SHORT).show();
-        });
-
-        btnLogin.setOnClickListener(v ->
-                startActivity(new Intent(this, AccountActivity.class)));
+        NavHostFragment navHost = (NavHostFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.fragmentContainer);
+        BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
+        NavigationUI.setupWithNavController(bottomNav, navHost.getNavController());
     }
 }

@@ -3,7 +3,7 @@
     android:id="@+id/registerRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F6F9F7"
+    android:background="?attr/colorBg"
     android:fillViewport="true">
 
     <LinearLayout
@@ -20,7 +20,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="TruyenDex."
-            android:textColor="#176B50"
+            android:textColor="?attr/colorBrand"
             android:textSize="26sp"
             android:textStyle="bold" />
 
@@ -30,7 +30,7 @@
             android:layout_marginTop="42dp"
             android:letterSpacing="0.12"
             android:text="GÓC NHỎ CỦA BẠN"
-            android:textColor="#60736B"
+            android:textColor="?attr/colorMuted"
             android:textSize="12sp" />
 
         <TextView
@@ -38,7 +38,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="Tạo tài khoản"
-            android:textColor="#17251F"
+            android:textColor="?attr/colorInk"
             android:textSize="30sp"
             android:textStyle="bold" />
 
@@ -48,14 +48,14 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="28dp"
             android:text="Tạo tài khoản để lưu lại hành trình đọc truyện."
-            android:textColor="#60736B"
+            android:textColor="?attr/colorMuted"
             android:textSize="15sp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Email"
-            android:textColor="#26352F"
+            android:textColor="?attr/colorInk"
             android:textSize="14sp" />
 
         <EditText
@@ -70,8 +70,8 @@
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
             android:singleLine="true"
-            android:textColor="#17251F"
-            android:textColorHint="#87948E"
+            android:textColor="?attr/colorInk"
+            android:textColorHint="?attr/colorMuted"
             android:textSize="16sp" />
 
         <TextView
@@ -79,7 +79,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:text="Mật khẩu"
-            android:textColor="#26352F"
+            android:textColor="?attr/colorInk"
             android:textSize="14sp" />
 
         <EditText
@@ -94,8 +94,8 @@
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
             android:singleLine="true"
-            android:textColor="#17251F"
-            android:textColorHint="#87948E"
+            android:textColor="?attr/colorInk"
+            android:textColorHint="?attr/colorMuted"
             android:textSize="16sp" />
 
         <TextView
@@ -103,7 +103,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:text="Xác nhận mật khẩu"
-            android:textColor="#26352F"
+            android:textColor="?attr/colorInk"
             android:textSize="14sp" />
 
         <EditText
@@ -118,8 +118,8 @@
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
             android:singleLine="true"
-            android:textColor="#17251F"
-            android:textColorHint="#87948E"
+            android:textColor="?attr/colorInk"
+            android:textColorHint="?attr/colorMuted"
             android:textSize="16sp" />
 
         <Button
@@ -127,10 +127,10 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:layout_marginTop="28dp"
-            android:backgroundTint="#176B50"
+            android:backgroundTint="?attr/colorBrand"
             android:text="Tạo tài khoản"
             android:textAllCaps="false"
-            android:textColor="#FFFFFF"
+            android:textColor="?attr/colorOnBrand"
             android:textSize="16sp"
             android:textStyle="bold" />
 
@@ -146,7 +146,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Đã có tài khoản? "
-                android:textColor="#60736B"
+                android:textColor="?attr/colorMuted"
                 android:textSize="14sp" />
 
             <TextView
@@ -158,7 +158,7 @@
                 android:focusable="true"
                 android:padding="6dp"
                 android:text="Đăng nhập"
-                android:textColor="#176B50"
+                android:textColor="?attr/colorBrand"
                 android:textSize="14sp"
                 android:textStyle="bold" />
         </LinearLayout>
