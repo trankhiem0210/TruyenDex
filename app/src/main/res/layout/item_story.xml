@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/spacing_xs"
+    android:background="@drawable/bg_card"
+    android:padding="@dimen/spacing_sm">
+    <ImageView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:id="@+id/homeNovelCover"
+        android:background="@drawable/bg_cover_green"
+        android:clipToOutline="true"
+        android:importantForAccessibility="no"
+        android:scaleType="centerCrop"
+        android:src="@drawable/cover_placeholder"
+        app:layout_constraintDimensionRatio="H,2:3"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/homeNovelTitle"
+        android:layout_marginTop="@dimen/spacing_sm"
+        android:ellipsize="end"
+        android:lines="2"
+        android:textColor="?attr/colorInk"
+        android:textSize="@dimen/text_body"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/homeNovelCover" />
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/homeNovelGenres"
+        android:layout_marginTop="@dimen/spacing_xs"
+        android:ellipsize="end"
+        android:lines="1"
+        android:textColor="?attr/colorMuted"
+        android:textSize="@dimen/text_sm"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/homeNovelTitle" />
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/homeNovelInfo"
+        android:layout_marginTop="@dimen/spacing_xs"
+        android:ellipsize="end"
+        android:lines="2"
+        android:textColor="?attr/colorMuted"
+        android:textSize="@dimen/text_sm"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/homeNovelGenres"
+        app:layout_constraintBottom_toBottomOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

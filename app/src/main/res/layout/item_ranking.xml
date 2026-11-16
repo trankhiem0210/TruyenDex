@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_card"
+    android:layout_marginBottom="@dimen/spacing_sm"
+    android:gravity="center_vertical"
+    android:minHeight="@dimen/rank_row_min_height"
+    android:orientation="horizontal"
+    android:paddingStart="@dimen/spacing_md"
+    android:paddingEnd="@dimen/spacing_md"
+    android:paddingTop="@dimen/spacing_sm"
+    android:paddingBottom="@dimen/spacing_sm">
+    <TextView
+        android:layout_width="@dimen/rank_number_width"
+        android:layout_height="wrap_content"
+        android:id="@+id/homeNovelRank"
+        android:textColor="?attr/colorBrand"
+        android:textSize="@dimen/text_md"
+        android:textStyle="bold"
+        android:visibility="gone" />
+
+    <ImageView
+        android:layout_width="@dimen/rank_cover_width"
+        android:layout_height="@dimen/rank_cover_height"
+        android:id="@+id/homeNovelCover"
+        android:background="@drawable/bg_cover_green"
+        android:clipToOutline="true"
+        android:importantForAccessibility="no"
+        android:scaleType="centerCrop"
+        android:src="@drawable/cover_placeholder" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/spacing_md"
+        android:layout_weight="1"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/homeNovelTitle"
+            android:textColor="?attr/colorInk"
+            android:textSize="@dimen/text_body"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/homeNovelInfo"
+            android:layout_marginTop="@dimen/spacing_xs"
+            android:background="@drawable/bg_segmented"
+            android:paddingStart="@dimen/spacing_sm"
+            android:paddingEnd="@dimen/spacing_sm"
+            android:paddingTop="@dimen/spacing_xs"
+            android:paddingBottom="@dimen/spacing_xs"
+            android:textColor="?attr/colorBrand"
+            android:textSize="@dimen/text_sm" />
+    </LinearLayout>
+</LinearLayout>

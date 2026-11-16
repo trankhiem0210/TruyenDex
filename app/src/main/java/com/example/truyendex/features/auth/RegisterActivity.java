@@ -13,6 +13,7 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.example.truyendex.MainActivity;
 import com.example.truyendex.R;
+import com.example.truyendex.core.ThemeManager;
 import com.example.truyendex.core.WindowInsetsHelper;
 import com.example.truyendex.data.repository.AuthRepository;
 
@@ -26,6 +27,7 @@ public class RegisterActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        ThemeManager.applyTheme(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
         WindowInsetsHelper.applySystemBarsPadding(findViewById(R.id.registerRoot));

@@ -1,3 +1,63 @@
 <resources>
     <string name="app_name">TruyenDex</string>
+
+    <!-- Header -->
+    <string name="brand_name">TruyenDex.</string>
+
+    <!-- Home -->
+    <string name="home_eyebrow">Một chút bình yên mỗi ngày</string>
+    <string name="home_title">Hôm nay, đọc gì nhỉ?</string>
+    <string name="search_hint">Tìm truyện, tác giả…</string>
+    <string name="home_no_results">Không tìm thấy truyện</string>
+
+    <!-- Sections -->
+    <string name="continue_reading">Tiếp nối câu chuyện</string>
+    <string name="table_of_contents">Mục lục</string>
+    <string name="read_continue">Đọc tiếp · %1$d%% chương →</string>
+    <string name="featured_title">Dành cho bạn</string>
+    <string name="discover_more">Khám phá thêm</string>
+    <string name="genres_title">Theo tâm trạng của bạn</string>
+    <string name="ranking_title">Bảng xếp hạng</string>
+
+    <!-- Ranking tabs -->
+    <string name="rank_week">Tuần</string>
+    <string name="rank_month">Tháng</string>
+    <string name="rank_all">Toàn thời gian</string>
+
+    <!-- Story info -->
+    <string name="chapter_count">%1$d chương</string>
+    <string name="chapter_label">Chương %1$d · %2$s</string>
+    <string name="views_count">%1$s lượt đọc</string>
+
+    <!-- Bottom navigation -->
+    <string name="nav_home">Trang chủ</string>
+    <string name="nav_explore">Khám phá</string>
+    <string name="nav_library">Thư viện</string>
+    <string name="nav_account">Tài khoản</string>
+
+    <!-- Genres -->
+    <string name="genre_fantasy">Fantasy</string>
+    <string name="genre_romance">Romance</string>
+    <string name="genre_daily">Đời thường</string>
+    <string name="genre_school">Học đường</string>
+    <string name="genre_action">Hành động</string>
+    <string name="genre_adventure">Phiêu lưu</string>
+    <string name="genre_comedy">Hài hước</string>
+    <string name="genre_mystery">Bí ẩn</string>
+    <string name="genre_drama">Drama</string>
+    <string name="genre_supernatural">Siêu nhiên</string>
+    <string name="genre_scifi">Khoa học viễn tưởng</string>
+    <string name="genre_history">Lịch sử</string>
+    <string name="theme_light">Sáng</string>
+    <string name="theme_dark">Tối</string>
+    <string name="theme_sepia">Sepia</string>
+    <string name="home_notifications">Thông báo</string>
+    <string name="home_no_notifications">Bạn chưa có thông báo mới.</string>
+    <string name="home_continue_title">Khu rừng của những lá thư</string>
+    <string name="home_continue_chapter">Chương 12 · Lá thư chưa gửi</string>
+    <string name="home_continue_action">Đọc tiếp · 62% chương →</string>
+    <string name="home_reading_progress">Tiến độ đọc</string>
+    <string name="home_story_info">%1$d chương · %2$s</string>
+    <string name="home_show_less">Thu gọn</string>
+    <string name="home_reader_unavailable">Nội dung chương này chưa có trong dữ liệu mẫu.</string>
 </resources>

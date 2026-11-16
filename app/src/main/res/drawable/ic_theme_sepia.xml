@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="@dimen/home_icon_size"
+    android:height="@dimen/home_icon_size"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path android:pathData="M4,5h6c1,0 2,1 2,2v13c0,-1 -1,-2 -2,-2H4Z M20,5h-6c-1,0 -2,1 -2,2v13c0,-1 1,-2 2,-2h6Z" android:strokeColor="?attr/colorMuted"
+        android:strokeWidth="1.7" android:strokeLineCap="round" android:strokeLineJoin="round" />
+</vector>

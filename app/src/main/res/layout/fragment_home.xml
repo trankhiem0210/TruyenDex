@@ -1,6 +1,382 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="?attr/colorBg"
+    android:orientation="vertical">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorSurface"
+        android:gravity="center_vertical"
+        android:minHeight="@dimen/header_height"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/spacing_sm"
+        android:paddingEnd="@dimen/spacing_sm">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="@dimen/spacing_sm"
+            android:text="@string/brand_name"
+            android:textColor="?attr/colorBrand"
+            android:textSize="@dimen/text_xl"
+            android:textStyle="bold" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/homeThemeToggle"
+            app:selectionRequired="true"
+            app:singleSelection="true">
+            <com.google.android.material.button.MaterialButton
+                android:layout_width="@dimen/touch_target"
+                android:layout_height="@dimen/touch_target"
+                style="@style/Widget.TruyenDex.Home.ThemeButton"
+                android:id="@+id/homeThemeLight"
+                android:contentDescription="@string/theme_light"
+                android:foreground="@drawable/home_theme_indicator"
+                app:icon="@drawable/ic_theme_light" />
+
+            <com.google.android.material.button.MaterialButton
+                android:layout_width="@dimen/touch_target"
+                android:layout_height="@dimen/touch_target"
+                style="@style/Widget.TruyenDex.Home.ThemeButton"
+                android:id="@+id/homeThemeDark"
+                android:contentDescription="@string/theme_dark"
+                android:foreground="@drawable/home_theme_indicator"
+                app:icon="@drawable/ic_theme_dark" />
+
+            <com.google.android.material.button.MaterialButton
+                android:layout_width="@dimen/touch_target"
+                android:layout_height="@dimen/touch_target"
+                style="@style/Widget.TruyenDex.Home.ThemeButton"
+                android:id="@+id/homeThemeSepia"
+                android:contentDescription="@string/theme_sepia"
+                android:foreground="@drawable/home_theme_indicator"
+                app:icon="@drawable/ic_theme_sepia" />
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+        <FrameLayout
+            android:layout_width="@dimen/touch_target"
+            android:layout_height="@dimen/touch_target">
+            <ImageButton
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/btnNotifications"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/home_notifications"
+                android:scaleType="center"
+                android:src="@drawable/ic_bell" />
+
+            <View
+                android:layout_width="@dimen/home_notification_dot_size"
+                android:layout_height="@dimen/home_notification_dot_size"
+                android:id="@+id/notificationDot"
+                android:layout_gravity="end|top"
+                android:layout_marginEnd="@dimen/spacing_md"
+                android:layout_marginTop="@dimen/spacing_sm"
+                android:background="@drawable/home_notification_dot"
+                android:importantForAccessibility="no" />
+        </FrameLayout>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/stroke_thin"
+        android:background="?attr/colorLine"
+        android:importantForAccessibility="no" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:id="@+id/homeScroll"
+        android:layout_weight="1"
+        android:fillViewport="true">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/spacing_lg"
+            android:focusableInTouchMode="true">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/home_eyebrow"
+                android:textColor="?attr/colorMuted"
+                android:textSize="@dimen/text_sm" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:accessibilityHeading="true"
+                android:fontFamily="serif"
+                android:text="@string/home_title"
+                android:textColor="?attr/colorInk"
+                android:textSize="@dimen/text_xxl"
+                android:textStyle="bold" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/homeSearch"
+                android:layout_marginTop="@dimen/spacing_md"
+                android:background="@drawable/bg_search"
+                android:drawableEnd="@drawable/ic_search"
+                android:drawablePadding="@dimen/spacing_sm"
+                android:hint="@string/search_hint"
+                android:imeOptions="actionDone"
+                android:inputType="text"
+                android:maxLines="1"
+                android:minHeight="@dimen/touch_target"
+                android:paddingStart="@dimen/spacing_md"
+                android:paddingEnd="@dimen/spacing_md"
+                android:textColor="?attr/colorInk"
+                android:textColorHint="?attr/colorMuted"
+                android:textSize="@dimen/text_body" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:id="@+id/homeSections">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_xxl"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:accessibilityHeading="true"
+                        android:text="@string/continue_reading"
+                        android:textColor="?attr/colorInk"
+                        android:textSize="@dimen/text_lg"
+                        android:textStyle="bold" />
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/btnToc"
+                        android:background="?attr/selectableItemBackground"
+                        android:minHeight="@dimen/touch_target"
+                        android:minWidth="@dimen/touch_target"
+                        android:paddingStart="@dimen/spacing_sm"
+                        android:paddingEnd="@dimen/spacing_sm"
+                        android:text="@string/table_of_contents"
+                        android:textAllCaps="false"
+                        android:textColor="?attr/colorBrand"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/continueCard"
+                    android:background="@drawable/bg_card"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="@dimen/spacing_md">
+                    <ImageView
+                        android:id="@+id/continueCover"
+                        android:layout_width="@dimen/cover_small_width"
+                        android:layout_height="@dimen/cover_small_height"
+                        android:background="@drawable/bg_cover_green"
+                        android:clipToOutline="true"
+                        android:importantForAccessibility="no"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/cover_placeholder" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="@dimen/spacing_md"
+                        android:orientation="vertical">
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/home_continue_title"
+                            android:textColor="?attr/colorInk"
+                            android:textSize="@dimen/text_md"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/spacing_xs"
+                            android:text="@string/home_continue_chapter"
+                            android:textColor="?attr/colorMuted"
+                            android:textSize="@dimen/text_sm" />
+
+                        <ProgressBar
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/progress_height"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:id="@+id/continueProgress"
+                            android:layout_marginTop="@dimen/spacing_sm"
+                            android:contentDescription="@string/home_reading_progress"
+                            android:indeterminate="false"
+                            android:max="100"
+                            android:progress="62"
+                            android:progressDrawable="@drawable/home_progress" />
+
+                        <androidx.appcompat.widget.AppCompatButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/btnContinueReading"
+                            android:background="?attr/selectableItemBackground"
+                            android:minHeight="@dimen/touch_target"
+                            android:minWidth="@dimen/touch_target"
+                            android:padding="0dp"
+                            android:text="@string/home_continue_action"
+                            android:textAllCaps="false"
+                            android:textColor="?attr/colorBrand"
+                            android:textSize="@dimen/text_body"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_xxl"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:accessibilityHeading="true"
+                        android:text="@string/featured_title"
+                        android:textColor="?attr/colorInk"
+                        android:textSize="@dimen/text_lg"
+                        android:textStyle="bold" />
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/btnDiscoverMore"
+                        android:background="?attr/selectableItemBackground"
+                        android:minHeight="@dimen/touch_target"
+                        android:minWidth="@dimen/touch_target"
+                        android:paddingStart="@dimen/spacing_sm"
+                        android:paddingEnd="@dimen/spacing_sm"
+                        android:text="@string/discover_more"
+                        android:textAllCaps="false"
+                        android:textColor="?attr/colorBrand"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/homeFeatured"
+                    android:layout_marginTop="@dimen/spacing_sm"
+                    android:nestedScrollingEnabled="false"
+                    android:overScrollMode="never" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:accessibilityHeading="true"
+                    android:text="@string/genres_title"
+                    android:textColor="?attr/colorInk"
+                    android:textSize="@dimen/text_lg"
+                    android:textStyle="bold"
+                    android:layout_marginTop="@dimen/spacing_xxl" />
+
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_sm"
+                    android:scrollbars="none">
+                    <com.google.android.material.chip.ChipGroup
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/homeGenres"
+                        app:chipSpacingHorizontal="@dimen/spacing_sm"
+                        app:singleLine="true"
+                        app:singleSelection="true" />
+                </HorizontalScrollView>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:accessibilityHeading="true"
+                    android:text="@string/ranking_title"
+                    android:textColor="?attr/colorInk"
+                    android:textSize="@dimen/text_lg"
+                    android:textStyle="bold"
+                    android:layout_marginTop="@dimen/spacing_xxl" />
+
+                <com.google.android.material.button.MaterialButtonToggleGroup
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/homeRankingTabs"
+                    android:layout_marginTop="@dimen/spacing_sm"
+                    android:background="@drawable/bg_segmented"
+                    app:selectionRequired="true"
+                    app:singleSelection="true">
+                    <com.google.android.material.button.MaterialButton
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        style="@style/Widget.TruyenDex.Home.RankButton"
+                        android:id="@+id/homeRankWeek"
+                        android:layout_weight="1"
+                        android:text="@string/rank_week" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        style="@style/Widget.TruyenDex.Home.RankButton"
+                        android:id="@+id/homeRankMonth"
+                        android:layout_weight="1"
+                        android:text="@string/rank_month" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        style="@style/Widget.TruyenDex.Home.RankButton"
+                        android:id="@+id/homeRankAll"
+                        android:layout_weight="1.4"
+                        android:text="@string/rank_all" />
+                </com.google.android.material.button.MaterialButtonToggleGroup>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/homeRanking"
+                    android:layout_marginTop="@dimen/spacing_sm"
+                    android:nestedScrollingEnabled="false"
+                    android:overScrollMode="never" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:id="@+id/homeSearchResults"
+                android:layout_marginTop="@dimen/spacing_md"
+                android:visibility="gone">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/homeNoResults"
+                    android:text="@string/home_no_results"
+                    android:padding="@dimen/spacing_md"
+                    android:textColor="?attr/colorMuted"
+                    android:visibility="gone" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:id="@+id/homeMatches"
+                    android:background="@drawable/bg_card" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>
