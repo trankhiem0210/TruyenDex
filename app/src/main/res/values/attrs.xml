@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="colorBg" format="color" />
+    <attr name="colorSurface" format="color" />
+    <attr name="colorSubtle" format="color" />
+    <attr name="colorInk" format="color" />
+    <attr name="colorMuted" format="color" />
+    <attr name="colorLine" format="color" />
+    <attr name="colorBrand" format="color" />
+    <attr name="colorOnBrand" format="color" />
+    <attr name="colorSoft" format="color" />
+</resources>

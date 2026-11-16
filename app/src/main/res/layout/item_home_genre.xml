@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.chip.Chip xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    style="@style/Widget.TruyenDex.Home.GenreChip"
+    android:checkable="true"
+    app:checkedIconVisible="false"
+    app:ensureMinTouchTargetSize="true"
+    app:chipMinTouchTargetSize="@dimen/touch_target"
+    app:chipMinHeight="@dimen/touch_target"
+    app:chipStrokeWidth="@dimen/stroke_thin"
+    app:chipCornerRadius="@dimen/radius_pill"
+    app:chipStartPadding="@dimen/spacing_sm"
+    app:chipEndPadding="@dimen/spacing_sm" />
