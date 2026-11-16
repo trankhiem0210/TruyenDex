@@ -8,6 +8,7 @@ import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 
@@ -52,6 +53,19 @@ public class AuthRepository {
     public boolean isEmailVerified() {
         FirebaseUser user = getCurrentUser();
         return user != null && user.isEmailVerified();
+    }
+
+    public Task<Void> updateDisplayName(String displayName) {
+        FirebaseUser user = getCurrentUser();
+        if (user == null) {
+            return com.google.android.gms.tasks.Tasks.forException(
+                    new IllegalStateException("No signed-in user to update."));
+        }
+
+        UserProfileChangeRequest profileUpdate = new UserProfileChangeRequest.Builder()
+                .setDisplayName(displayName)
+                .build();
+        return user.updateProfile(profileUpdate);
     }
 
     public Task<Void> sendPasswordResetEmail(String email) {
