@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
         ThemeManager.applyTheme(this);
         super.onCreate(savedInstanceState);
 
-        if (authRepository.getCurrentUser() == null) {
+        if (authRepository.getCurrentUser() == null || !authRepository.isEmailVerified()) {
             startActivity(new Intent(this, LoginActivity.class));
             finish();
             return;

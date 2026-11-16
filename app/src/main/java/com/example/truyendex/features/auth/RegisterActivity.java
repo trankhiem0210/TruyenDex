@@ -9,6 +9,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+
 import com.example.truyendex.MainActivity;
 import com.example.truyendex.R;
 import com.example.truyendex.core.ThemeManager;
@@ -43,7 +45,7 @@ public class RegisterActivity extends Activity {
     @Override
     protected void onStart() {
         super.onStart();
-        if (authRepository.getCurrentUser() != null) {
+        if (authRepository.isEmailVerified()) {
             openMainScreen();
         }
     }
@@ -74,7 +76,7 @@ public class RegisterActivity extends Activity {
                 .addOnCompleteListener(this, task -> {
                     setLoading(false);
                     if (task.isSuccessful()) {
-                        openMainScreen();
+                        sendVerificationEmail();
                     } else {
                         Exception exception = task.getException();
                         Toast.makeText(
@@ -84,6 +86,29 @@ public class RegisterActivity extends Activity {
                         ).show();
                     }
                 });
+    }
+
+    private void sendVerificationEmail() {
+                setLoading(true);
+                authRepository.sendEmailVerification()
+                        .addOnCompleteListener(this, task -> {
+                            setLoading(false);
+                            authRepository.signOut();
+
+                            String title = task.isSuccessful()
+                                    ? "Kiểm tra email"
+                                    : "Tài khoản đã được tạo";
+                            String message = task.isSuccessful()
+                                    ? "Chúng tôi đã gửi liên kết xác minh. Hãy mở email và xác minh địa chỉ trước khi đăng nhập."
+                                    : "Tài khoản đã được tạo nhưng chưa gửi được email xác minh. Hãy quay lại đăng nhập và chọn gửi lại email xác minh.";
+
+                            new AlertDialog.Builder(this)
+                                    .setTitle(title)
+                                    .setMessage(message)
+                                    .setCancelable(false)
+                                    .setPositiveButton("Đến đăng nhập", (dialog, which) -> finish())
+                                    .show();
+                        });
     }
 
     private void setLoading(boolean loading) {

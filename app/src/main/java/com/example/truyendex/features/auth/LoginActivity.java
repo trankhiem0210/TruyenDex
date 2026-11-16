@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Patterns;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -22,6 +23,10 @@ public class LoginActivity extends Activity {
     private EditText emailInput;
     private EditText passwordInput;
     private Button loginButton;
+    private View verificationPanel;
+    private TextView verificationMessage;
+    private TextView resendVerificationButton;
+    private TextView checkVerificationButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,18 +38,33 @@ public class LoginActivity extends Activity {
         emailInput = findViewById(R.id.editEmail);
         passwordInput = findViewById(R.id.editPassword);
         loginButton = findViewById(R.id.buttonLogin);
+        verificationPanel = findViewById(R.id.verificationPanel);
+        verificationMessage = findViewById(R.id.textVerificationMessage);
+        resendVerificationButton = findViewById(R.id.textResendVerification);
+        checkVerificationButton = findViewById(R.id.textCheckVerification);
 
         loginButton.setOnClickListener(view -> signIn());
         findViewById(R.id.textCreateAccount).setOnClickListener(
-                view -> startActivity(new Intent(this, RegisterActivity.class)));
+                view -> {
+                    if (authRepository.getCurrentUser() != null
+                            && !authRepository.isEmailVerified()) {
+                        authRepository.signOut();
+                    }
+                    startActivity(new Intent(this, RegisterActivity.class));
+                });
         findViewById(R.id.textForgotPassword).setOnClickListener(view -> sendPasswordReset());
+        resendVerificationButton.setOnClickListener(view -> resendVerificationEmail());
+        checkVerificationButton.setOnClickListener(view -> checkVerificationStatus());
+        findViewById(R.id.textUseAnotherAccount).setOnClickListener(view -> useAnotherAccount());
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        if (authRepository.getCurrentUser() != null) {
+        if (authRepository.isEmailVerified()) {
             openMainScreen();
+        } else if (authRepository.getCurrentUser() != null) {
+            showVerificationPanel();
         }
     }
 
@@ -68,7 +88,11 @@ public class LoginActivity extends Activity {
                 .addOnCompleteListener(this, task -> {
                     setLoading(false);
                     if (task.isSuccessful()) {
-                        openMainScreen();
+                        if (authRepository.isEmailVerified()) {
+                            openMainScreen();
+                        } else {
+                            showVerificationPanel();
+                        }
                     } else {
                         Exception exception = task.getException();
                         Toast.makeText(
@@ -78,6 +102,59 @@ public class LoginActivity extends Activity {
                         ).show();
                     }
                 });
+    }
+
+    private void showVerificationPanel() {
+                String email = authRepository.getCurrentUser().getEmail();
+                if (email != null) {
+                    emailInput.setText(email);
+                }
+                verificationMessage.setText(
+                        "Email chưa được xác minh. Mở liên kết trong hộp thư của bạn, sau đó quay lại kiểm tra."
+                );
+                verificationPanel.setVisibility(View.VISIBLE);
+    }
+
+    private void resendVerificationEmail() {
+                resendVerificationButton.setEnabled(false);
+                authRepository.sendEmailVerification()
+                        .addOnCompleteListener(this, task -> {
+                            resendVerificationButton.setEnabled(true);
+                            String message = task.isSuccessful()
+                                    ? "Đã gửi lại email xác minh. Hãy kiểm tra hộp thư và thư rác."
+                                    : AuthRepository.getErrorMessage(task.getException());
+                            Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+                        });
+    }
+
+    private void checkVerificationStatus() {
+                checkVerificationButton.setEnabled(false);
+                authRepository.reloadCurrentUser()
+                        .addOnCompleteListener(this, task -> {
+                            checkVerificationButton.setEnabled(true);
+                            if (task.isSuccessful() && authRepository.isEmailVerified()) {
+                                openMainScreen();
+                            } else if (task.isSuccessful()) {
+                                Toast.makeText(
+                                        this,
+                                        "Email vẫn chưa được xác minh. Hãy mở liên kết trong email trước.",
+                                        Toast.LENGTH_LONG
+                                ).show();
+                            } else {
+                                Toast.makeText(
+                                        this,
+                                        AuthRepository.getErrorMessage(task.getException()),
+                                        Toast.LENGTH_LONG
+                                ).show();
+                            }
+                        });
+    }
+
+    private void useAnotherAccount() {
+                authRepository.signOut();
+                verificationPanel.setVisibility(View.GONE);
+                emailInput.setText("");
+                passwordInput.setText("");
     }
 
     private void sendPasswordReset() {
