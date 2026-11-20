@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/colorSurface"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/spacing_lg"
+        android:paddingVertical="@dimen/spacing_md">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Bộ lọc nâng cao"
+            android:textColor="?attr/colorInk"
+            android:textSize="@dimen/text_lg"
+            android:textStyle="bold" />
+
+        <ImageButton
+            android:id="@+id/btnCloseFilterSheet"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Đóng bộ lọc"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            app:tint="?attr/colorInk" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/stroke_thin"
+        android:background="?attr/colorLine" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="380dp"
+        android:padding="@dimen/spacing_lg">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tác giả"
+                android:textColor="?attr/colorInk"
+                android:textSize="@dimen/text_body" />
+
+            <EditText
+                android:id="@+id/edtFilterAuthor"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/touch_target"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="@dimen/spacing_md"
+                android:background="@drawable/auth_input_background"
+                android:hint="Có thể bỏ trống"
+                android:inputType="text"
+                android:paddingHorizontal="@dimen/spacing_md"
+                android:textColor="?attr/colorInk"
+                android:textColorHint="?attr/colorMuted"
+                android:textSize="@dimen/text_md" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Họa sĩ"
+                android:textColor="?attr/colorInk"
+                android:textSize="@dimen/text_body" />
+
+            <EditText
+                android:id="@+id/edtFilterArtist"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/touch_target"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="@dimen/spacing_md"
+                android:background="@drawable/auth_input_background"
+                android:hint="Có thể bỏ trống"
+                android:inputType="text"
+                android:paddingHorizontal="@dimen/spacing_md"
+                android:textColor="?attr/colorInk"
+                android:textColorHint="?attr/colorMuted"
+                android:textSize="@dimen/text_md" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tình trạng"
+                android:textColor="?attr/colorInk"
+                android:textSize="@dimen/text_body" />
+
+            <Spinner
+                android:id="@+id/spinnerFilterStatus"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/touch_target"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="@dimen/spacing_md"
+                android:background="@drawable/auth_input_background" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sắp xếp"
+                android:textColor="?attr/colorInk"
+                android:textSize="@dimen/text_body" />
+
+            <Spinner
+                android:id="@+id/spinnerFilterSort"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/touch_target"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="@dimen/spacing_md"
+                android:background="@drawable/auth_input_background" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Loại truyện"
+                android:textColor="?attr/colorInk"
+                android:textSize="@dimen/text_body"
+                android:textStyle="bold" />
+
+            <RadioGroup
+                android:id="@+id/rgFilterType"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_md">
+
+                <RadioButton
+                    android:id="@+id/rbTypeAll"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="Tất cả"
+                    android:textColor="?attr/colorInk" />
+
+                <RadioButton
+                    android:id="@+id/rbTypeTrans"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Truyện dịch"
+                    android:textColor="?attr/colorInk" />
+
+                <RadioButton
+                    android:id="@+id/rbTypeAi"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="AI dịch"
+                    android:textColor="?attr/colorInk" />
+
+                <RadioButton
+                    android:id="@+id/rbTypeOriginal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Sáng tác"
+                    android:textColor="?attr/colorInk" />
+            </RadioGroup>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Thể loại"
+                android:textColor="?attr/colorInk"
+                android:textSize="@dimen/text_body"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_sm"
+                android:text="Kết quả phải có tất cả thể loại được chọn."
+                android:textColor="?attr/colorMuted"
+                android:textSize="@dimen/text_sm" />
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chipGroupSheetGenres"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/stroke_thin"
+        android:background="?attr/colorLine" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="@dimen/spacing_md">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSheetReset"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/touch_target"
+            android:layout_marginEnd="@dimen/spacing_sm"
+            android:layout_weight="1"
+            android:text="Đặt lại"
+            android:textAllCaps="false"
+            android:textColor="?attr/colorBrand"
+            app:cornerRadius="@dimen/radius_md"
+            app:strokeColor="?attr/colorLine" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSheetApply"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/touch_target"
+            android:layout_weight="1"
+            android:text="Áp dụng"
+            android:textAllCaps="false"
+            android:textColor="?attr/colorOnBrand"
+            app:backgroundTint="?attr/colorBrand"
+            app:cornerRadius="@dimen/radius_md" />
+    </LinearLayout>
+</LinearLayout>

@@ -1,6 +1,181 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/exploreScroll"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="?attr/colorBg"
+    android:fillViewport="true">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/spacing_lg">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:letterSpacing="0.08"
+            android:text="TÌM CÂU CHUYỆN TIẾP THEO"
+            android:textColor="?attr/colorMuted"
+            android:textSize="@dimen/text_xs"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_xs"
+            android:layout_marginBottom="@dimen/spacing_lg"
+            android:fontFamily="serif"
+            android:text="Khám phá"
+            android:textColor="?attr/colorInk"
+            android:textSize="@dimen/text_xxl"
+            android:textStyle="bold" />
+
+        <!-- tim kiem, bo loc -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/edtExploreQuery"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/touch_target"
+                android:layout_weight="1"
+                android:background="@drawable/bg_search"
+                android:drawableEnd="@drawable/ic_search"
+                android:drawablePadding="@dimen/spacing_sm"
+                android:hint="Tên truyện, tác giả…"
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:maxLines="1"
+                android:paddingHorizontal="@dimen/spacing_md"
+                android:textColor="?attr/colorInk"
+                android:textColorHint="?attr/colorMuted"
+                android:textSize="@dimen/text_md" />
+
+            <ImageButton
+                android:id="@+id/btnOpenFilterIcon"
+                android:layout_width="@dimen/touch_target"
+                android:layout_height="@dimen/touch_target"
+                android:layout_marginStart="@dimen/spacing_sm"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Mở bộ lọc nâng cao"
+                android:src="@drawable/ic_filter" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvOpenFilterText"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:text="Bộ lọc nâng cao"
+            android:textColor="?attr/colorBrand"
+            android:textSize="@dimen/text_sm"
+            android:textStyle="bold" />
+
+        <!-- loc the loai -->
+        <HorizontalScrollView
+            android:id="@+id/scrollExploreGenres"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_xs"
+            android:scrollbars="none">
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chipGroupExploreGenres"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:chipSpacingHorizontal="@dimen/spacing_sm"
+                app:singleLine="true" />
+        </HorizontalScrollView>
+
+        <!-- so luong ket qua -->
+        <TextView
+            android:id="@+id/tvExploreSummary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="@dimen/spacing_md"
+            android:textColor="?attr/colorMuted"
+            android:textSize="@dimen/text_sm" />
+
+        <!-- 2 cot -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvExploreGrid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"
+            android:overScrollMode="never" />
+
+        <!-- trong khi khong co truyen khop -->
+        <LinearLayout
+            android:id="@+id/layoutExploreEmpty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_card"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="@dimen/spacing_xxl"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_search"
+                app:tint="?attr/colorMuted" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_md"
+                android:text="Không tìm thấy truyện"
+                android:textColor="?attr/colorInk"
+                android:textSize="@dimen/text_lg"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_xs"
+                android:layout_marginBottom="@dimen/spacing_lg"
+                android:gravity="center"
+                android:text="Thử từ khóa khác hoặc bỏ bớt bộ lọc."
+                android:textColor="?attr/colorMuted"
+                android:textSize="@dimen/text_body" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnClearFilters"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/touch_target"
+                android:text="Xóa bộ lọc"
+                android:textAllCaps="false"
+                android:textColor="?attr/colorOnBrand"
+                app:backgroundTint="?attr/colorBrand"
+                app:cornerRadius="@dimen/radius_md" />
+        </LinearLayout>
+
+        <!-- nut xem them -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnExploreLoadMore"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/touch_target"
+            android:layout_marginTop="@dimen/spacing_lg"
+            android:text="Xem thêm"
+            android:textAllCaps="false"
+            android:textColor="?attr/colorBrand"
+            android:textStyle="bold"
+            app:backgroundTint="?attr/colorSurface"
+            app:cornerRadius="@dimen/radius_md"
+            app:strokeColor="?attr/colorLine"
+            app:strokeWidth="@dimen/stroke_thin" />
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

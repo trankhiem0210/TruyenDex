@@ -1,6 +1,184 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="?attr/colorBg"
+    android:fillViewport="true">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/spacing_lg">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:letterSpacing="0.08"
+            android:text="NHỮNG CÂU CHUYỆN BẠN GIỮ LẠI"
+            android:textColor="?attr/colorMuted"
+            android:textSize="@dimen/text_xs"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_xs"
+            android:layout_marginBottom="@dimen/spacing_lg"
+            android:fontFamily="serif"
+            android:text="Thư viện"
+            android:textColor="?attr/colorInk"
+            android:textSize="@dimen/text_xxl"
+            android:textStyle="bold" />
+
+        <!-- thanh Segmented Control -->
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/toggleLibraryTabs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_md"
+            android:background="@drawable/bg_segmented"
+            android:padding="@dimen/spacing_xs"
+            app:selectionRequired="true"
+            app:singleSelection="true">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/tabLibReading"
+                style="@style/Widget.TruyenDex.Home.RankButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Đang đọc"
+                android:textSize="@dimen/text_sm" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/tabLibShelf"
+                style="@style/Widget.TruyenDex.Home.RankButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Kệ sách"
+                android:textSize="@dimen/text_sm" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/tabLibBookmarks"
+                style="@style/Widget.TruyenDex.Home.RankButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.1"
+                android:text="Bookmark"
+                android:textSize="@dimen/text_sm" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/tabLibHistory"
+                style="@style/Widget.TruyenDex.Home.RankButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.9"
+                android:text="Lịch sử"
+                android:textSize="@dimen/text_sm" />
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+        <!-- thanh bam nhanh tab ke sach -->
+        <LinearLayout
+            android:id="@+id/layoutShelfActions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_sm"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/btnMarkSelected"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:enabled="false"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:text="Đã đọc mục chọn"
+                android:textColor="?attr/colorMuted"
+                android:textSize="@dimen/text_sm"
+                android:textStyle="bold" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/btnMarkAll"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:text="Đã đọc tất cả"
+                android:textColor="?attr/colorBrand"
+                android:textSize="@dimen/text_sm"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- ds the thu vien -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvLibraryList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"
+            android:overScrollMode="never" />
+
+        <!-- tt trong rieng cho tung tab -->
+        <LinearLayout
+            android:id="@+id/layoutLibraryEmpty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_card"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="@dimen/spacing_xxl"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_book"
+                app:tint="?attr/colorMuted" />
+
+            <TextView
+                android:id="@+id/tvLibraryEmptyTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_md"
+                android:gravity="center"
+                android:textColor="?attr/colorInk"
+                android:textSize="@dimen/text_lg"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvLibraryEmptyDesc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_xs"
+                android:layout_marginBottom="@dimen/spacing_lg"
+                android:gravity="center"
+                android:textColor="?attr/colorMuted"
+                android:textSize="@dimen/text_body" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnEmptyDiscover"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/touch_target"
+                android:text="Khám phá truyện"
+                android:textAllCaps="false"
+                android:textColor="?attr/colorOnBrand"
+                app:backgroundTint="?attr/colorBrand"
+                app:cornerRadius="@dimen/radius_md" />
+        </LinearLayout>
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>
