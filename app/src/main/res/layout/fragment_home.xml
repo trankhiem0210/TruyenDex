@@ -196,6 +196,7 @@
                         android:layout_marginStart="@dimen/spacing_md"
                         android:orientation="vertical">
                         <TextView
+                            android:id="@+id/continueTitle"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/home_continue_title"
@@ -204,6 +205,7 @@
                             android:textStyle="bold" />
 
                         <TextView
+                            android:id="@+id/continueChapter"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/spacing_xs"
