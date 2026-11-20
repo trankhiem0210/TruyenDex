@@ -1,6 +1,457 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="?attr/colorBg"
+    android:orientation="vertical">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- Topbar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="?attr/colorSurface"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="12dp">
+
+        <Button
+            android:id="@+id/btnDetailBack"
+            style="@style/Widget.Material3Expressive.Button.TextButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:text="←"
+            android:textColor="?attr/colorInk"
+            android:textSize="18sp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Chi tiết truyện"
+            android:textColor="?attr/colorInk"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnDetailWallet"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="wrap_content"
+            android:layout_height="38dp"
+            android:layout_marginEnd="6dp"
+            android:backgroundTint="?attr/colorSoft"
+            android:text="0 xu"
+            android:textColor="?attr/colorBrand"
+            android:textSize="12sp" />
+
+        <Button
+            android:id="@+id/btnDetailTheme"
+            style="@style/Widget.Material3Expressive.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="Giao diện"
+            android:textColor="?attr/colorBrand"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?attr/colorLine" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Hero -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="112dp"
+                    android:layout_height="168dp"
+                    android:background="@drawable/bg_cover_green"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="TRUYENDEX"
+                        android:textColor="#E0FFFFFF"
+                        android:textSize="10sp" />
+
+                    <TextView
+                        android:id="@+id/tvCoverTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:ellipsize="end"
+                        android:maxLines="4"
+                        android:text="Kiếm Lai"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="0dp">
+
+                    <TextView
+                        android:id="@+id/tvNovelStatus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="?attr/colorSoft"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="4dp"
+                        android:text="Đang tiến hành"
+                        android:textColor="?attr/colorBrand"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvNovelTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Kiếm Lai"
+                        android:textColor="?attr/colorInk"
+                        android:textSize="21sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvNovelAuthor"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="Phong Hoả Hí Chư Hầu"
+                        android:textColor="?attr/colorMuted"
+                        android:textSize="13sp" />
+
+                    <TextView
+                        android:id="@+id/tvNovelType"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Truyện dịch · 2 tập"
+                        android:textColor="?attr/colorMuted"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Thể loại -->
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chipGroupGenres"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                app:chipSpacingHorizontal="8dp" />
+
+            <!-- Thống kê -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:background="?attr/colorSurface"
+                android:orientation="horizontal"
+                android:paddingVertical="14dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="4,8 / 5\n32 đánh giá"
+                    android:textColor="?attr/colorInk"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/tvStatChapters"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="18\nChương truyện"
+                    android:textColor="?attr/colorInk"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/tvStatViews"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="12,4k\nLượt đọc"
+                    android:textColor="?attr/colorInk"
+                    android:textSize="13sp" />
+            </LinearLayout>
+
+            <!-- Tiến độ đọc -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="?attr/colorSoft"
+                android:orientation="vertical"
+                android:padding="14dp">
+
+                <TextView
+                    android:id="@+id/tvResumeChapter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Bạn đang đọc chương 1"
+                    android:textColor="?attr/colorInk"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <ProgressBar
+                    style="?android:progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="6dp"
+                    android:layout_marginTop="8dp"
+                    android:max="100"
+                    android:progress="25" />
+            </LinearLayout>
+
+            <!-- Ghi chú mở khoá xu -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Chương 16-18 bằng xu"
+                    android:textColor="?attr/colorMuted"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/tvSeeBundlePrice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="Xem giá"
+                    android:textColor="?attr/colorBrand"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Giới thiệu truyện -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Giới thiệu truyện"
+                android:textColor="?attr/colorInk"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvSynopsis"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:ellipsize="end"
+                android:lineSpacingMultiplier="1.35"
+                android:maxLines="4"
+                android:text="Thế gian bao la, không thiếu điều kỳ lạ. Trần Bình An, một thiếu niên nghèo khổ ở hẻm Nê Bình thuộc trấn nhỏ biên thùy, từ một thợ nung sứ từng bước bước vào giang hồ và thế giới tu hành rộng lớn."
+                android:textColor="?attr/colorInk"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/tvToggleSynopsis"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="Xem thêm"
+                android:textColor="?attr/colorBrand"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <!-- Thẻ tác giả -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="?attr/colorSurface"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="12dp">
+
+                <TextView
+                    android:id="@+id/tvAuthorAvatar"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="?attr/colorSoft"
+                    android:gravity="center"
+                    android:text="P"
+                    android:textColor="?attr/colorBrand"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tác giả"
+                        android:textColor="?attr/colorMuted"
+                        android:textSize="11sp" />
+
+                    <TextView
+                        android:id="@+id/tvAuthorCardName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Phong Hoả Hí Chư Hầu"
+                        android:textColor="?attr/colorInk"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Mục lục chương -->
+            <LinearLayout
+                android:id="@+id/cardChapters"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="?attr/colorSurface"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="12dp">
+
+                <TextView
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:background="?attr/colorSoft"
+                    android:gravity="center"
+                    android:text="☰"
+                    android:textColor="?attr/colorBrand"
+                    android:textSize="18sp" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Mục lục chương"
+                        android:textColor="?attr/colorInk"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvChaptersSummary"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Xem danh sách chương"
+                        android:textColor="?attr/colorMuted"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="›"
+                    android:textColor="?attr/colorMuted"
+                    android:textSize="22sp" />
+            </LinearLayout>
+
+            <!-- Giao diện nhanh -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnQuickLight"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:text="Sáng"
+                    android:textSize="12sp" />
+
+                <Button
+                    android:id="@+id/btnQuickDark"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_marginHorizontal="6dp"
+                    android:layout_weight="1"
+                    android:text="Tối"
+                    android:textSize="12sp" />
+
+                <Button
+                    android:id="@+id/btnQuickSepia"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:text="Sepia"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Footer -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?attr/colorLine" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorSurface"
+        android:orientation="horizontal"
+        android:padding="12dp">
+
+        <Button
+            android:id="@+id/btnReadContinue"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:backgroundTint="?attr/colorBrand"
+            android:text="Đọc tiếp · Chương 1"
+            android:textColor="?attr/colorOnBrand" />
+
+        <Button
+            android:id="@+id/btnSaveNovel"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_marginStart="8dp"
+            android:text="Lưu"
+            android:textColor="?attr/colorBrand" />
+    </LinearLayout>
+</LinearLayout>

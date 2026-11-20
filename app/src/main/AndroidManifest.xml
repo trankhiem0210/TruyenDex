@@ -34,6 +34,12 @@
         <activity
             android:name=".features.account.AccountActivity"
             android:exported="false" />
+        <activity
+            android:name=".features.novel.ChaptersActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.reader.ReaderActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

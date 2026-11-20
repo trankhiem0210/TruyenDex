@@ -1,5 +1,6 @@
 package com.example.truyendex.data.repository;
 
+import com.example.truyendex.data.local.AppDatabase;
 import com.example.truyendex.data.model.Novel;
 
 import java.util.ArrayList;
@@ -8,10 +9,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-/**
- * Repository providing sample novel data matching the Figma design.
- * In production, this would fetch from an API via RetrofitClient.
- */
+// kho du lieu truyen
 public class NovelRepository {
 
     private static NovelRepository instance;
@@ -22,6 +20,26 @@ public class NovelRepository {
             instance = new NovelRepository();
         }
         return instance;
+    }
+
+    // cap nhat danh sach truyen tu sqlite vao danh sach hien thi
+    public void loadNovelsFromDb(AppDatabase db) {
+        if (db == null) return;
+        List<Novel> dbList = db.getAllNovelsFromDb();
+        for (Novel item : dbList) {
+            boolean found = false;
+            for (int i = 0; i < novels.size(); i++) {
+                if (novels.get(i).getId() == item.getId()) {
+                    item.setCoverImageResId(novels.get(i).getCoverImageResId());
+                    novels.set(i, item);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                novels.add(0, item);
+            }
+        }
     }
 
     private NovelRepository() {
@@ -69,7 +87,7 @@ public class NovelRepository {
     }
 
     public List<Novel> getFeaturedNovels() {
-        // Return first 4 novels as featured (like Figma design)
+        // lay 4 truyen dau lam truyen de xuat
         return new ArrayList<>(novels.subList(0, Math.min(4, novels.size())));
     }
 
@@ -80,11 +98,7 @@ public class NovelRepository {
         return null;
     }
 
-    /**
-     * Get ranking sorted by the given period.
-     * @param period "week", "month", or "all"
-     * @return sorted list of top novels
-     */
+    // sap xep bang xep hang theo tuan, thang hoac tat ca
     public List<Novel> getRanking(String period) {
         List<Novel> sorted = new ArrayList<>(novels);
         Comparator<Novel> cmp;

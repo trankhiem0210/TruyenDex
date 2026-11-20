@@ -18,12 +18,22 @@ import java.util.Locale;
 
 final class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.NovelHolder> {
 
+    interface OnNovelClickListener {
+        void onNovelClick(Novel novel);
+    }
+
     private final int layout;
+    private final OnNovelClickListener listener;
     private List<Novel> novels = Collections.emptyList();
     private String rankingPeriod;
 
     HomeAdapter(int layout) {
+        this(layout, null);
+    }
+
+    HomeAdapter(int layout, OnNovelClickListener listener) {
         this.layout = layout;
+        this.listener = listener;
     }
 
     void show(List<Novel> novels, String rankingPeriod) {
@@ -54,6 +64,10 @@ final class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.NovelHolder> {
             TextView rank = holder.itemView.findViewById(R.id.homeNovelRank);
             rank.setText(String.format(Locale.getDefault(), "%d", position + 1));
             rank.setVisibility(View.VISIBLE);
+        }
+
+        if (listener != null) {
+            holder.itemView.setOnClickListener(v -> listener.onNovelClick(novel));
         }
     }
 

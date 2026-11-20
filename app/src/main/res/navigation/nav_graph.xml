@@ -28,4 +28,10 @@
         android:name="com.example.truyendex.features.account.AccountFragment"
         android:label="@string/nav_account"
         tools:layout="@layout/fragment_account" />
+
+    <fragment
+        android:id="@+id/nav_novel_detail"
+        android:name="com.example.truyendex.features.novel.NovelDetailFragment"
+        android:label="Chi tiết truyện"
+        tools:layout="@layout/fragment_novel_detail" />
 </navigation>
