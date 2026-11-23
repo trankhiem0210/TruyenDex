@@ -9,7 +9,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import com.example.truyendex.MainActivity;
 import com.example.truyendex.R;
@@ -102,7 +102,7 @@ public class RegisterActivity extends Activity {
                                     ? "Chúng tôi đã gửi liên kết xác minh. Hãy mở email và xác minh địa chỉ trước khi đăng nhập."
                                     : "Tài khoản đã được tạo nhưng chưa gửi được email xác minh. Hãy quay lại đăng nhập và chọn gửi lại email xác minh.";
 
-                            new AlertDialog.Builder(this)
+                            new MaterialAlertDialogBuilder(this)
                                     .setTitle(title)
                                     .setMessage(message)
                                     .setCancelable(false)

@@ -138,7 +138,7 @@
                 android:id="@+id/textVerificationMessage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="#26352F"
+                android:textColor="?attr/colorInk"
                 android:textSize="14sp" />
 
             <TextView
@@ -151,7 +151,7 @@
                 android:focusable="true"
                 android:padding="6dp"
                 android:text="Gửi lại email xác minh"
-                android:textColor="#176B50"
+                android:textColor="?attr/colorBrand"
                 android:textSize="14sp"
                 android:textStyle="bold" />
 
@@ -164,7 +164,7 @@
                 android:focusable="true"
                 android:padding="6dp"
                 android:text="Tôi đã xác minh — kiểm tra lại"
-                android:textColor="#176B50"
+                android:textColor="?attr/colorBrand"
                 android:textSize="14sp"
                 android:textStyle="bold" />
 
@@ -177,7 +177,7 @@
                 android:focusable="true"
                 android:padding="6dp"
                 android:text="Dùng tài khoản khác"
-                android:textColor="#60736B"
+                android:textColor="?attr/colorMuted"
                 android:textSize="14sp" />
         </LinearLayout>
 

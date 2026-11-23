@@ -1,5 +1,6 @@
 package com.example.truyendex.features.library;
 
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.TypedValue;
@@ -10,6 +11,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
+
+import com.example.truyendex.features.reader.ReaderActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -54,6 +58,19 @@ public class LibraryFragment extends Fragment {
         allRecords = LibraryRecord.load(requireContext());
 
         adapter = new LibraryAdapter(new LibraryAdapter.OnLibraryActionListener() {
+            @Override
+            public void onOpenNovel(int novelId) {
+                Bundle args = new Bundle();
+                args.putInt("novel_id", novelId);
+                Navigation.findNavController(view).navigate(R.id.open_novel_detail, args);
+            }
+
+            @Override
+            public void onOpenChapter(int novelId, int chapter) {
+                startActivity(new Intent(requireContext(), ReaderActivity.class)
+                        .putExtra("novel_id", novelId).putExtra("chapter_number", chapter));
+            }
+
             @Override
             public void onSelectionChanged(int selectedCount) {
                 updateMarkSelectedState(selectedCount > 0);

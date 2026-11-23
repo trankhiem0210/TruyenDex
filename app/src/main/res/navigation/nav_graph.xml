@@ -5,6 +5,14 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/nav_home">
 
+    <action
+        android:id="@+id/open_novel_detail"
+        app:destination="@id/nav_novel_detail"
+        app:enterAnim="@anim/screen_enter"
+        app:exitAnim="@anim/screen_exit"
+        app:popEnterAnim="@anim/screen_return"
+        app:popExitAnim="@anim/screen_leave" />
+
     <fragment
         android:id="@+id/nav_home"
         android:name="com.example.truyendex.features.home.HomeFragment"

@@ -1,0 +1,9 @@
+<com.example.truyendex.features.novel.ChapterDropdown xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/chapterDropdown"
+    android:layout_width="match_parent"
+    android:layout_height="220dp"
+    android:background="?attr/colorSurface"
+    android:nestedScrollingEnabled="true"
+    android:divider="?attr/colorLine"
+    android:dividerHeight="1dp"
+    android:visibility="gone" />

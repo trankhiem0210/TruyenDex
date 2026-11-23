@@ -13,11 +13,11 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -30,12 +30,11 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 
 import java.text.Collator;
-import java.text.Normalizer;
+import static com.example.truyendex.core.SearchText.normalize;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.regex.Pattern;
 
 public class SearchFragment extends Fragment {
 
@@ -75,9 +74,11 @@ public class SearchFragment extends Fragment {
         layoutEmpty = view.findViewById(R.id.layoutExploreEmpty);
         btnLoadMore = view.findViewById(R.id.btnExploreLoadMore);
 
-        adapter = new SearchAdapter(novel ->
-                Toast.makeText(requireContext(), "Mở truyện: " + novel.getName(), Toast.LENGTH_SHORT).show()
-        );
+        adapter = new SearchAdapter(novel -> {
+            Bundle args = new Bundle();
+            args.putInt("novel_id", novel.getId());
+            Navigation.findNavController(view).navigate(R.id.open_novel_detail, args);
+        });
         rvGrid.setLayoutManager(new GridLayoutManager(requireContext(), 2));
         rvGrid.setAdapter(adapter);
 
@@ -164,7 +165,7 @@ public class SearchFragment extends Fragment {
         String normArtist = normalize(artistFilter);
 
         for (Novel n : all) {
-            boolean okQ = normQ.isEmpty() || normalize(n.getName() + " " + n.getAuthor()).contains(normQ);
+            boolean okQ = normQ.isEmpty() || normalize(n.getName() + " " + n.getAuthor() + " " + n.getGenresText()).contains(normQ);
             boolean okAuthor = normAuthor.isEmpty() || normalize(n.getAuthor()).contains(normAuthor);
             boolean okArtist = normArtist.isEmpty() || normalize(n.getArtist()).contains(normArtist);
             boolean okStatus = statusFilter.isEmpty() || statusFilter.equals(n.getStatus());
@@ -283,14 +284,4 @@ public class SearchFragment extends Fragment {
         dialog.show();
     }
 
-    private static String normalize(String input) {
-        if (input == null) return "";
-        String temp = Normalizer.normalize(input, Normalizer.Form.NFD);
-        Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
-        return pattern.matcher(temp).replaceAll("")
-                .replace('đ', 'd')
-                .replace('Đ', 'D')
-                .toLowerCase(Locale.ROOT)
-                .trim();
-    }
 }

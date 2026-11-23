@@ -1,0 +1,11 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/chaptersRoot" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:orientation="vertical">
+    <Button android:id="@+id/chaptersBack" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:text="Quay lại" />
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:padding="16dp" android:textSize="22sp" android:textStyle="bold" android:text="Danh sách chương" />
+    <TextView android:id="@+id/chaptersEmpty" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:gravity="center" android:text="Chưa có dữ liệu chương." />
+    <ListView android:id="@+id/chapterList" android:layout_width="match_parent" android:layout_height="match_parent" />
+</LinearLayout>

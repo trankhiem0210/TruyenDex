@@ -1,0 +1,13 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="?attr/colorSurface"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:orientation="vertical" android:padding="24dp">
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:textColor="?attr/colorInk" android:text="Ví xu demo" android:textAppearance="?attr/textAppearanceHeadlineSmall" />
+    <TextView android:textColor="?attr/colorInk" android:id="@+id/walletBalance" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:layout_marginVertical="16dp" android:textSize="22sp" />
+    <Button android:id="@+id/packOne" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:text="30 xu · 10.000 đồng" />
+    <Button android:id="@+id/packTwo" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:text="60 xu · 20.000 đồng" />
+</LinearLayout>

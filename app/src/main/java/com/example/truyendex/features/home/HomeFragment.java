@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.truyendex.R;
+import com.example.truyendex.core.SearchText;
 import com.example.truyendex.core.ThemeManager;
 import com.example.truyendex.data.local.AppDatabase;
 import com.example.truyendex.data.model.Chapter;
@@ -63,7 +64,7 @@ public class HomeFragment extends Fragment {
 
         // khoi tao db va nap truyen kiem lai tu assets neu chua co
         db = new AppDatabase(requireContext());
-        db.importKiemLaiIfEmpty(requireContext(), 1);
+        db.initChapterIfEmpty(requireContext(), 1);
         repository.loadNovelsFromDb(db);
 
         setupThemeToggle(view);
@@ -266,7 +267,7 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence text, int start, int before, int count) {
-                showSearchResults(view, text.toString().trim().toLowerCase(Locale.ROOT));
+                showSearchResults(view, SearchText.normalize(text.toString()));
             }
 
             @Override
@@ -287,7 +288,7 @@ public class HomeFragment extends Fragment {
         LayoutInflater inflater = LayoutInflater.from(root.getContext());
         for (Novel novel : repository.getAllNovels()) {
             String searchableText = novel.getName() + "\n" + novel.getAuthor() + "\n" + novel.getGenresText();
-            if (searchableText.toLowerCase(Locale.ROOT).contains(query)) {
+            if (SearchText.normalize(searchableText).contains(query)) {
                 View row = inflater.inflate(R.layout.item_ranking, matches, false);
                 HomeAdapter.bindNovel(row, novel, novel.getAuthor());
                 row.setOnClickListener(v -> openNovelDetail(v, novel));
@@ -303,7 +304,7 @@ public class HomeFragment extends Fragment {
         if (novel == null) return;
         Bundle args = new Bundle();
         args.putInt("novel_id", novel.getId());
-        Navigation.findNavController(anchorView).navigate(R.id.nav_novel_detail, args);
+        Navigation.findNavController(anchorView).navigate(R.id.open_novel_detail, args);
     }
 
     @Override

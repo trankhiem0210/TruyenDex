@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.TruyenDex.Light" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="TruyenDexActivityAnimation" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/screen_enter</item>
+        <item name="android:activityOpenExitAnimation">@anim/screen_exit</item>
+        <item name="android:activityCloseEnterAnimation">@anim/screen_return</item>
+        <item name="android:activityCloseExitAnimation">@anim/screen_leave</item>
+    </style>
+    <style name="Theme.TruyenDex.Light" parent="Theme.Material3.Light.NoActionBar">
+        <item name="android:windowAnimationStyle">@style/TruyenDexActivityAnimation</item>
+        <item name="android:textColorPrimary">@color/theme_text_primary</item>
+        <item name="android:textColorSecondary">@color/theme_text_secondary</item>
+        <item name="android:textColorHint">@color/theme_text_secondary</item>
         <item name="colorPrimary">?attr/colorBrand</item>
         <item name="colorOnPrimary">?attr/colorOnBrand</item>
         <item name="colorPrimaryContainer">?attr/colorSoft</item>
@@ -33,7 +43,11 @@
         <item name="android:windowLightNavigationBar">true</item>
     </style>
 
-    <style name="Theme.TruyenDex.Dark" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Theme.TruyenDex.Dark" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="android:windowAnimationStyle">@style/TruyenDexActivityAnimation</item>
+        <item name="android:textColorPrimary">@color/theme_text_primary</item>
+        <item name="android:textColorSecondary">@color/theme_text_secondary</item>
+        <item name="android:textColorHint">@color/theme_text_secondary</item>
         <item name="colorPrimary">?attr/colorBrand</item>
         <item name="colorOnPrimary">?attr/colorOnBrand</item>
         <item name="colorPrimaryContainer">?attr/colorSoft</item>
@@ -66,7 +80,11 @@
         <item name="android:windowLightNavigationBar">false</item>
     </style>
 
-    <style name="Theme.TruyenDex.Sepia" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Theme.TruyenDex.Sepia" parent="Theme.Material3.Light.NoActionBar">
+        <item name="android:windowAnimationStyle">@style/TruyenDexActivityAnimation</item>
+        <item name="android:textColorPrimary">@color/theme_text_primary</item>
+        <item name="android:textColorSecondary">@color/theme_text_secondary</item>
+        <item name="android:textColorHint">@color/theme_text_secondary</item>
         <item name="colorPrimary">?attr/colorBrand</item>
         <item name="colorOnPrimary">?attr/colorOnBrand</item>
         <item name="colorPrimaryContainer">?attr/colorSoft</item>
