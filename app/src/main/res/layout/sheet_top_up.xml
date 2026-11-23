@@ -1,0 +1,21 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="?attr/colorSurface"
+    android:layout_width="match_parent" android:layout_height="wrap_content">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:padding="20dp">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:textColor="?attr/colorInk" android:text="Nạp xu bằng VietQR" android:textSize="22sp" android:textStyle="bold" />
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:textColor="?attr/colorMuted" android:text="Tài khoản minh họa. Chỉ quét thử, vui lòng không chuyển tiền." />
+        <TextView android:textColor="?attr/colorInk" android:id="@+id/orderSummary" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_marginTop="12dp" android:textIsSelectable="true" />
+        <WebView android:id="@+id/orderQr" android:layout_width="208dp" android:layout_height="208dp"
+            android:layout_gravity="center_horizontal" android:contentDescription="Mã VietQR của đơn nạp" />
+        <TextView android:textColor="?attr/colorMuted" android:id="@+id/qrStatus" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:gravity="center" android:accessibilityLiveRegion="polite" />
+        <Button android:id="@+id/retryQr" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:text="Tải lại mã QR" android:visibility="gone" />
+        <Button android:id="@+id/confirmDemo" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:text="Mô phỏng tiền về" />
+    </LinearLayout>
+</ScrollView>

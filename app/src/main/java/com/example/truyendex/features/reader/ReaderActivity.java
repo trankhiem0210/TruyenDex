@@ -1,13 +1,10 @@
 package com.example.truyendex.features.reader;
 
-import android.app.AlertDialog;
-import android.content.Intent;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.speech.tts.TextToSpeech;
-import android.speech.tts.UtteranceProgressListener;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.Button;
@@ -17,15 +14,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import com.google.android.material.button.MaterialButton;
 
 import com.example.truyendex.R;
 import com.example.truyendex.core.ThemeManager;
-import com.example.truyendex.core.WalletPref;
+import com.example.truyendex.data.repository.WalletRepository;
+import com.example.truyendex.features.wallet.WalletBottomSheet;
 import com.example.truyendex.data.local.AppDatabase;
 import com.example.truyendex.data.model.Chapter;
 import com.example.truyendex.data.model.Novel;
 import com.example.truyendex.data.repository.NovelRepository;
-import com.example.truyendex.features.novel.ChaptersActivity;
+import com.example.truyendex.features.novel.ChapterDropdown;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +38,7 @@ public class ReaderActivity extends AppCompatActivity {
     private boolean toolsVisible = true;
 
     private AppDatabase db;
-    private WalletPref wallet;
+    private WalletRepository wallet;
     private SharedPreferences prefs;
 
     private ScrollView scrollReader;
@@ -48,13 +47,7 @@ public class ReaderActivity extends AppCompatActivity {
     private TextView tvPaywallBalance, tvEndChapterNote, tvProgressCaption, tvReadPercent, tvTtsStatus;
     private Button btnReaderWallet, btnShowTools, btnPrevChap, btnNextChap, btnEndNextChapter, btnBookmark, btnTtsPlayPause, btnTtsRate;
 
-    // Text-To-Speech
-    private TextToSpeech tts;
-    private boolean ttsReady = false;
-    private boolean ttsPlaying = false;
-    private int ttsIndex = 0;
-    private final float[] rates = {0.8f, 1.0f, 1.25f, 1.5f};
-    private int rateIdx = 1;
+    private TtsController tts;
     private final List<String> paragraphs = new ArrayList<>();
     private final List<TextView> paragraphViews = new ArrayList<>();
 
@@ -62,12 +55,14 @@ public class ReaderActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         ThemeManager.applyTheme(this);
         super.onCreate(savedInstanceState);
+        androidx.core.view.WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         setContentView(R.layout.activity_reader);
+        com.example.truyendex.core.WindowInsetsHelper.applySystemBarsPadding(findViewById(R.id.readerRoot));
 
         novelId = getIntent().getIntExtra("novel_id", 1);
         db = new AppDatabase(this);
         db.initChapterIfEmpty(this, novelId);
-        wallet = new WalletPref(this);
+        wallet = new WalletRepository(this);
         prefs = getSharedPreferences("truyendex_prefs", MODE_PRIVATE);
 
         currentChapter = getIntent().getIntExtra("chapter_number", db.getCurrentChapter(novelId));
@@ -83,10 +78,25 @@ public class ReaderActivity extends AppCompatActivity {
             if (novel != null) totalChapters = novel.getChapters();
         }
 
+        getSupportFragmentManager().setFragmentResultListener(WalletBottomSheet.UPDATED, this,
+                (key, result) -> loadChapter(currentChapter));
+        if (savedInstanceState != null) currentChapter = savedInstanceState.getInt("reader_chapter", currentChapter);
         bindViews();
-        initTTS();
+        tts = new TtsController(this, paragraphs, (playing, index, status) -> {
+            btnTtsPlayPause.setText(playing ? "Tạm dừng" : "Phát");
+            ((MaterialButton) btnTtsPlayPause).setIconResource(playing
+                    ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play);
+            tvTtsStatus.setText(status);
+            highlightParagraph(index);
+        });
         setupEvents();
         loadChapter(currentChapter);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle state) {
+        super.onSaveInstanceState(state);
+        state.putInt("reader_chapter", currentChapter);
     }
 
     private void bindViews() {
@@ -121,17 +131,17 @@ public class ReaderActivity extends AppCompatActivity {
 
     private void setupEvents() {
         findViewById(R.id.btnReaderBack).setOnClickListener(v -> finish());
-        btnReaderWallet.setOnClickListener(v -> wallet.showTopUpDialog(this, () -> loadChapter(currentChapter)));
+        btnReaderWallet.setOnClickListener(v -> WalletBottomSheet.open(getSupportFragmentManager()));
 
         findViewById(R.id.btnHideTools).setOnClickListener(v -> setToolsVisible(false));
         btnShowTools.setOnClickListener(v -> setToolsVisible(true));
         readerContentBox.setOnClickListener(v -> setToolsVisible(!toolsVisible));
 
-        scrollReader.getViewTreeObserver().addOnScrollChangedListener(() -> {
+        scrollReader.setOnScrollChangeListener((view, x, y, oldX, oldY) -> {
             View child = scrollReader.getChildAt(0);
             if (child == null) return;
             int max = child.getHeight() - scrollReader.getHeight();
-            int percent = max > 0 ? Math.min(100, Math.max(0, (scrollReader.getScrollY() * 100) / max)) : 100;
+            int percent = max > 0 ? Math.min(100, Math.max(0, (y * 100) / max)) : 100;
             tvReadPercent.setText(percent + "%");
             if (percent >= 98) db.markChapterRead(novelId, currentChapter);
         });
@@ -147,9 +157,9 @@ public class ReaderActivity extends AppCompatActivity {
         });
 
         View.OnClickListener openChapters = v -> {
-            Intent intent = new Intent(this, ChaptersActivity.class);
-            intent.putExtra("novel_id", novelId);
-            startActivity(intent);
+            setToolsVisible(true);
+            ChapterDropdown dropdown = findViewById(R.id.chapterDropdown);
+            dropdown.toggle(db, wallet, novelId, currentChapter, this::loadChapter);
         };
         findViewById(R.id.btnChapters).setOnClickListener(openChapters);
         findViewById(R.id.btnEndChapters).setOnClickListener(openChapters);
@@ -170,7 +180,7 @@ public class ReaderActivity extends AppCompatActivity {
                 loadChapter(currentChapter);
             } else {
                 Toast.makeText(this, "Không đủ xu!", Toast.LENGTH_SHORT).show();
-                wallet.showTopUpDialog(this, () -> loadChapter(currentChapter));
+                WalletBottomSheet.open(getSupportFragmentManager());
             }
         });
 
@@ -180,39 +190,27 @@ public class ReaderActivity extends AppCompatActivity {
                 loadChapter(currentChapter);
             } else {
                 Toast.makeText(this, "Không đủ xu!", Toast.LENGTH_SHORT).show();
-                wallet.showTopUpDialog(this, () -> loadChapter(currentChapter));
+                WalletBottomSheet.open(getSupportFragmentManager());
             }
         });
 
         findViewById(R.id.btnListen).setOnClickListener(v -> {
-            if (ttsPlayerBar.getVisibility() == View.VISIBLE) stopTTS(true);
+            if (ttsPlayerBar.isShown()) closePlayer();
             else {
                 ttsPlayerBar.setVisibility(View.VISIBLE);
-                startSpeakingFrom(0);
+                tts.play(0);
             }
         });
 
-        btnTtsPlayPause.setOnClickListener(v -> {
-            if (ttsPlaying) pauseTTS();
-            else startSpeakingFrom(ttsIndex);
-        });
-
-        findViewById(R.id.btnTtsPrev).setOnClickListener(v -> {
-            if (ttsIndex > 0) startSpeakingFrom(ttsIndex - 1);
-        });
-        findViewById(R.id.btnTtsNext).setOnClickListener(v -> {
-            if (ttsIndex < paragraphs.size() - 1) startSpeakingFrom(ttsIndex + 1);
-        });
-        btnTtsRate.setOnClickListener(v -> {
-            rateIdx = (rateIdx + 1) % rates.length;
-            btnTtsRate.setText(rates[rateIdx] + "x");
-            if (ttsReady) tts.setSpeechRate(rates[rateIdx]);
-            if (ttsPlaying) startSpeakingFrom(ttsIndex);
-        });
-        findViewById(R.id.btnTtsClose).setOnClickListener(v -> stopTTS(true));
+        btnTtsPlayPause.setOnClickListener(v -> tts.togglePlayback());
+        findViewById(R.id.btnTtsPrev).setOnClickListener(v -> tts.skip(-1));
+        findViewById(R.id.btnTtsNext).setOnClickListener(v -> tts.skip(1));
+        btnTtsRate.setOnClickListener(v -> btnTtsRate.setText(tts.nextRate() + "x"));
+        findViewById(R.id.btnTtsClose).setOnClickListener(v -> closePlayer());
     }
 
     private void setToolsVisible(boolean visible) {
+        if (!visible) ((ChapterDropdown) findViewById(R.id.chapterDropdown)).collapse();
         toolsVisible = visible;
         readerTopBar.setVisibility(visible ? View.VISIBLE : View.GONE);
         readerBottomBar.setVisibility(visible ? View.VISIBLE : View.GONE);
@@ -221,7 +219,9 @@ public class ReaderActivity extends AppCompatActivity {
 
     // tai noi dung chuong va kiem tra mo khoa
     private void loadChapter(int chapterNumber) {
-        stopTTS(false);
+        boolean changedChapter = chapterNumber != currentChapter;
+        ((ChapterDropdown) findViewById(R.id.chapterDropdown)).collapse();
+        tts.stop();
         currentChapter = chapterNumber;
         db.saveCurrentChapter(novelId, chapterNumber);
 
@@ -267,11 +267,11 @@ public class ReaderActivity extends AppCompatActivity {
             for (String line : lines) {
                 String text = line.trim();
                 if (!text.isEmpty()) paragraphs.add(text);
+                if (!allowed && paragraphs.size() == 2) break;
             }
         }
 
-        int limit = allowed ? paragraphs.size() : Math.min(2, paragraphs.size());
-        for (int i = 0; i < limit; i++) {
+        for (int i = 0; i < paragraphs.size(); i++) {
             TextView tv = new TextView(this);
             tv.setText(paragraphs.get(i));
             tv.setTypeface(Typeface.SERIF);
@@ -292,22 +292,34 @@ public class ReaderActivity extends AppCompatActivity {
             paywallBox.setVisibility(View.GONE);
         } else {
             paywallBox.setVisibility(View.VISIBLE);
+            Button bundle = findViewById(R.id.btnUnlockBundle);
+            bundle.setVisibility(chapterNumber >= 16 && chapterNumber <= 18 && db.hasPaidBundle(novelId)
+                    ? View.VISIBLE : View.GONE);
+            bundle.setText("Mở chương 16–18 · " + wallet.bundlePrice(novelId) + " xu");
             tvPaywallBalance.setText("Giá: 10 xu · Số dư: " + wallet.getBalance() + " xu");
         }
 
         updateBookmarkUI();
         scrollReader.scrollTo(0, 0);
+        if (changedChapter) {
+            readerContentBox.animate().cancel();
+            readerContentBox.setAlpha(0.55f);
+            readerContentBox.animate().alpha(1f).setDuration(150).start();
+        }
         tvReadPercent.setText("0%");
     }
 
     private void updateBookmarkUI() {
-        btnBookmark.setText(db.isBookmarked(novelId, currentChapter) ? "Đã lưu" : "Đánh dấu");
+        boolean saved = db.isBookmarked(novelId, currentChapter);
+        btnBookmark.setText(saved ? "Đã lưu" : "Lưu");
+        ((MaterialButton) btnBookmark).setIconResource(saved
+                ? android.R.drawable.btn_star_big_on : android.R.drawable.btn_star_big_off);
     }
 
     private void showFontAndThemeDialog() {
         int currentSize = prefs.getInt("font_size", 18);
         String[] items = {"Tăng cỡ chữ (+2sp)", "Giảm cỡ chữ (-2sp)", "Giao diện: Sáng", "Giao diện: Tối", "Giao diện: Sepia"};
-        new AlertDialog.Builder(this)
+        new MaterialAlertDialogBuilder(this)
                 .setTitle("Tùy chỉnh trang đọc (" + currentSize + "sp)")
                 .setItems(items, (d, which) -> {
                     if (which == 0 && currentSize < 28) {
@@ -335,58 +347,9 @@ public class ReaderActivity extends AppCompatActivity {
         return tv.data;
     }
 
-    private void initTTS() {
-        tts = new TextToSpeech(this, status -> {
-            if (status == TextToSpeech.SUCCESS) {
-                int res = tts.setLanguage(new Locale.Builder().setLanguage("vi").setRegion("VN").build());
-                ttsReady = (res != TextToSpeech.LANG_MISSING_DATA && res != TextToSpeech.LANG_NOT_SUPPORTED);
-                tts.setSpeechRate(rates[rateIdx]);
-                tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
-                    @Override public void onStart(String id) {}
-                    @Override public void onDone(String id) {
-                        runOnUiThread(() -> {
-                            if (!ttsPlaying) return;
-                            if (ttsIndex + 1 < paragraphViews.size()) startSpeakingFrom(ttsIndex + 1);
-                            else {
-                                stopTTS(false);
-                                tvTtsStatus.setText("Đã đọc hết chương");
-                            }
-                        });
-                    }
-                    @Override public void onError(String id) {}
-                });
-            }
-        });
-    }
-
-    private void startSpeakingFrom(int index) {
-        if (!ttsReady) {
-            Toast.makeText(this, "Thiết bị chưa hỗ trợ đọc tiếng Việt", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if (index < 0 || index >= paragraphViews.size()) return;
-        ttsIndex = index;
-        ttsPlaying = true;
-        btnTtsPlayPause.setText("Tạm dừng");
-        tvTtsStatus.setText("Đang đọc đoạn " + (ttsIndex + 1) + "/" + paragraphViews.size());
-        highlightParagraph(ttsIndex);
-        tts.speak(paragraphs.get(ttsIndex), TextToSpeech.QUEUE_FLUSH, null, "utt_" + ttsIndex);
-    }
-
-    private void pauseTTS() {
-        ttsPlaying = false;
-        if (tts != null) tts.stop();
-        btnTtsPlayPause.setText("Phát");
-        tvTtsStatus.setText("Tạm dừng ở đoạn " + (ttsIndex + 1));
-    }
-
-    private void stopTTS(boolean hideBar) {
-        ttsPlaying = false;
-        ttsIndex = 0;
-        if (tts != null) tts.stop();
-        btnTtsPlayPause.setText("Phát");
-        highlightParagraph(-1);
-        if (hideBar) ttsPlayerBar.setVisibility(View.GONE);
+    private void closePlayer() {
+        tts.stop();
+        ttsPlayerBar.setVisibility(View.GONE);
     }
 
     private void highlightParagraph(int activeIndex) {
@@ -398,10 +361,8 @@ public class ReaderActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        if (tts != null) {
-            tts.stop();
-            tts.shutdown();
-        }
+        tts.close();
+        db.close();
         super.onDestroy();
     }
 }

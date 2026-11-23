@@ -1,6 +1,6 @@
 package com.example.truyendex.features.novel;
 
-import android.app.AlertDialog;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,8 +15,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.truyendex.R;
-import com.example.truyendex.core.ThemeManager;
-import com.example.truyendex.core.WalletPref;
+import com.example.truyendex.data.repository.WalletRepository;
+import com.example.truyendex.features.wallet.WalletBottomSheet;
 import com.example.truyendex.data.local.AppDatabase;
 import com.example.truyendex.data.model.Novel;
 import com.example.truyendex.data.repository.NovelRepository;
@@ -30,7 +30,7 @@ public class NovelDetailFragment extends Fragment {
     private int novelId = 1;
     private boolean expanded = false;
     private AppDatabase db;
-    private WalletPref wallet;
+    private WalletRepository wallet;
     private SharedPreferences prefs;
 
     private TextView tvResumeChapter;
@@ -50,7 +50,7 @@ public class NovelDetailFragment extends Fragment {
 
         db = new AppDatabase(requireContext());
         db.initChapterIfEmpty(requireContext(), novelId);
-        wallet = new WalletPref(requireContext());
+        wallet = new WalletRepository(requireContext());
         prefs = requireContext().getSharedPreferences("truyendex_prefs", Context.MODE_PRIVATE);
 
         // uu tien lay thong tin truyen tu db, neu khong co moi lay tu repository
@@ -113,40 +113,38 @@ public class NovelDetailFragment extends Fragment {
         view.findViewById(R.id.btnDetailBack).setOnClickListener(v ->
                 requireActivity().getOnBackPressedDispatcher().onBackPressed()
         );
-        btnDetailWallet.setOnClickListener(v -> wallet.showTopUpDialog(requireContext(), this::refreshWallet));
-        view.findViewById(R.id.btnDetailTheme).setOnClickListener(v -> {
-            String[] labels = {"Sáng", "Tối", "Sepia"};
-            String[] values = {ThemeManager.LIGHT, ThemeManager.DARK, ThemeManager.SEPIA};
-            new AlertDialog.Builder(requireContext())
-                    .setTitle("Giao diện")
-                    .setItems(labels, (d, w) -> ThemeManager.setTheme(requireActivity(), values[w]))
-                    .show();
-        });
+        getChildFragmentManager().setFragmentResultListener(WalletBottomSheet.UPDATED, getViewLifecycleOwner(),
+                (key, result) -> refreshWallet());
+        btnDetailWallet.setOnClickListener(v -> WalletBottomSheet.open(getChildFragmentManager()));
+        View bundleOffer = (View) view.findViewById(R.id.tvSeeBundlePrice).getParent();
+        bundleOffer.setVisibility(db.hasPaidBundle(novelId) ? View.VISIBLE : View.GONE);
         view.findViewById(R.id.tvSeeBundlePrice).setOnClickListener(v ->
-                new AlertDialog.Builder(requireContext())
+                new MaterialAlertDialogBuilder(requireContext())
                         .setTitle("Mở khóa chương 16–18")
                         .setMessage("Mở lẻ: 10 xu / chương.\nMua trọn gói 3 chương: 25 xu.\nSố dư hiện tại: " + wallet.getBalance() + " xu.")
-                        .setPositiveButton("Mua gói 25 xu", (d, w) -> {
+                        .setPositiveButton("Mở gói · " + wallet.bundlePrice(novelId) + " xu", (d, w) -> {
                             if (wallet.unlockBundle16To18(novelId)) {
                                 Toast.makeText(requireContext(), "Đã mở khóa cả 3 chương!", Toast.LENGTH_SHORT).show();
                                 refreshWallet();
                             } else {
                                 Toast.makeText(requireContext(), "Không đủ xu!", Toast.LENGTH_SHORT).show();
-                                wallet.showTopUpDialog(requireContext(), this::refreshWallet);
+                                WalletBottomSheet.open(getChildFragmentManager());
                             }
                         })
                         .setNegativeButton("Đóng", null)
                         .show()
         );
 
+        ChapterDropdown dropdown = view.findViewById(R.id.chapterDropdown);
+        View chevron = view.findViewById(R.id.chapterChevron);
         view.findViewById(R.id.cardChapters).setOnClickListener(v -> {
-            Intent intent = new Intent(requireContext(), ChaptersActivity.class);
-            intent.putExtra("novel_id", novelId);
-            startActivity(intent);
+            dropdown.toggle(db, wallet, novelId, db.getCurrentChapter(novelId), chapter -> {
+                chevron.setRotation(0f);
+                startActivity(new Intent(requireContext(), ReaderActivity.class)
+                        .putExtra("novel_id", novelId).putExtra("chapter_number", chapter));
+            });
+            chevron.setRotation(dropdown.isShown() ? 180f : 0f);
         });
-        view.findViewById(R.id.btnQuickLight).setOnClickListener(v -> ThemeManager.setTheme(requireActivity(), ThemeManager.LIGHT));
-        view.findViewById(R.id.btnQuickDark).setOnClickListener(v -> ThemeManager.setTheme(requireActivity(), ThemeManager.DARK));
-        view.findViewById(R.id.btnQuickSepia).setOnClickListener(v -> ThemeManager.setTheme(requireActivity(), ThemeManager.SEPIA));
         // mo trang doc o chuong dang doc do
         btnReadContinue.setOnClickListener(v -> {
             int ch = db.getCurrentChapter(novelId);

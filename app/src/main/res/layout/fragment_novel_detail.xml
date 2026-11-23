@@ -14,14 +14,16 @@
         android:gravity="center_vertical"
         android:paddingHorizontal="12dp">
 
-        <Button
+        <ImageButton
             android:id="@+id/btnDetailBack"
-            style="@style/Widget.Material3Expressive.Button.TextButton"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:text="←"
-            android:textColor="?attr/colorInk"
-            android:textSize="18sp" />
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="10dp"
+            android:scaleType="fitCenter"
+            android:contentDescription="Quay lại"
+            app:srcCompat="@drawable/abc_ic_ab_back_material"
+            app:tint="?attr/colorInk" />
 
         <TextView
             android:layout_width="0dp"
@@ -43,14 +45,6 @@
             android:textColor="?attr/colorBrand"
             android:textSize="12sp" />
 
-        <Button
-            android:id="@+id/btnDetailTheme"
-            style="@style/Widget.Material3Expressive.Button.TextButton"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:text="Giao diện"
-            android:textColor="?attr/colorBrand"
-            android:textSize="12sp" />
     </LinearLayout>
 
     <View
@@ -58,7 +52,7 @@
         android:layout_height="1dp"
         android:background="?attr/colorLine" />
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
@@ -380,48 +374,17 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="›"
+                    android:id="@+id/chapterChevron"
+                    android:text="⌄"
+                    android:importantForAccessibility="no"
                     android:textColor="?attr/colorMuted"
                     android:textSize="22sp" />
             </LinearLayout>
 
-            <!-- Giao diện nhanh -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:orientation="horizontal">
+            <include layout="@layout/chapter_dropdown" />
 
-                <Button
-                    android:id="@+id/btnQuickLight"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:layout_width="0dp"
-                    android:layout_height="40dp"
-                    android:layout_weight="1"
-                    android:text="Sáng"
-                    android:textSize="12sp" />
-
-                <Button
-                    android:id="@+id/btnQuickDark"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:layout_width="0dp"
-                    android:layout_height="40dp"
-                    android:layout_marginHorizontal="6dp"
-                    android:layout_weight="1"
-                    android:text="Tối"
-                    android:textSize="12sp" />
-
-                <Button
-                    android:id="@+id/btnQuickSepia"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:layout_width="0dp"
-                    android:layout_height="40dp"
-                    android:layout_weight="1"
-                    android:text="Sepia"
-                    android:textSize="12sp" />
-            </LinearLayout>
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
     <!-- Footer -->
     <View

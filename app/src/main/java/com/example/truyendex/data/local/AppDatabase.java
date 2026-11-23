@@ -93,10 +93,16 @@ public class AppDatabase extends SQLiteOpenHelper {
         }
 
         if (novelId == 1) {
-            importKiemLaiIfEmpty(context, novelId);
-        } else {
-            generateSampleChapters(novelId);
+            try {
+                if (Arrays.asList(context.getAssets().list("")).contains("kiem_lai.txt")) {
+                    importKiemLaiIfEmpty(context, novelId);
+                    return;
+                }
+            } catch (java.io.IOException e) {
+                android.util.Log.w("AppDatabase", "Cannot list bundled chapters", e);
+            }
         }
+        generateSampleChapters(novelId);
     }
 
     // sinh chuong mau cho cac truyen khac
@@ -268,6 +274,20 @@ public class AppDatabase extends SQLiteOpenHelper {
             c.close();
         }
         return list;
+    }
+
+    public Cursor chapterList(int novelId) {
+        return getReadableDatabase().rawQuery(
+                "SELECT id AS _id, title, chapter_number, is_paid FROM chapters WHERE novel_id=? ORDER BY chapter_number",
+                new String[]{String.valueOf(novelId)});
+    }
+
+    public boolean hasPaidBundle(int novelId) {
+        try (Cursor rows = getReadableDatabase().rawQuery(
+                "SELECT COUNT(DISTINCT chapter_number) FROM chapters WHERE novel_id=? AND chapter_number BETWEEN 16 AND 18 AND is_paid=1",
+                new String[]{String.valueOf(novelId)})) {
+            return rows.moveToFirst() && rows.getInt(0) == 3;
+        }
     }
 
     public int getTotalChapters(int novelId) {

@@ -31,18 +31,18 @@ public final class ThemeManager {
     }
 
     public static void applyTheme(Activity activity) {
-        int style;
-        switch (getTheme(activity)) {
+        activity.setTheme(styleFor(activity));
+    }
+
+    public static int styleFor(Context context) {
+        switch (getTheme(context)) {
             case DARK:
-                style = R.style.Theme_TruyenDex_Dark;
-                break;
+                return R.style.Theme_TruyenDex_Dark;
             case SEPIA:
-                style = R.style.Theme_TruyenDex_Sepia;
-                break;
+                return R.style.Theme_TruyenDex_Sepia;
             default:
-                style = R.style.Theme_TruyenDex_Light;
+                return R.style.Theme_TruyenDex_Light;
         }
-        activity.setTheme(style);
     }
 
     private static SharedPreferences preferences(Context context) {

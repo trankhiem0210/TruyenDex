@@ -17,9 +17,11 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 public class MainActivity extends AppCompatActivity {
 
     private final AuthRepository authRepository = new AuthRepository();
+    private String appliedTheme;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        appliedTheme = ThemeManager.getTheme(this);
         ThemeManager.applyTheme(this);
         super.onCreate(savedInstanceState);
 
@@ -38,5 +40,11 @@ public class MainActivity extends AppCompatActivity {
         if (navHost != null) {
             NavigationUI.setupWithNavController(bottomNav, navHost.getNavController());
         }
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        if (!ThemeManager.getTheme(this).equals(appliedTheme)) recreate();
     }
 }

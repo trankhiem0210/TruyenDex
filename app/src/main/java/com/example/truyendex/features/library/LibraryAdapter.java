@@ -9,7 +9,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -32,6 +31,8 @@ public class LibraryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public static final String MODE_HISTORY = "history";
 
     public interface OnLibraryActionListener {
+        void onOpenNovel(int novelId);
+        void onOpenChapter(int novelId, int chapter);
         void onSelectionChanged(int selectedCount);
         void onMarkSingleRead(int novelId);
         void onRemoveBookmark(int novelId, int chapter);
@@ -92,6 +93,7 @@ public class LibraryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         int coverRes = novel.getCoverImageResId() == 0
                 ? R.drawable.cover_placeholder : novel.getCoverImageResId();
 
+        holder.itemView.setOnClickListener(v -> listener.onOpenNovel(record.novelId));
         if (holder instanceof ReadingHolder) {
             ReadingHolder h = (ReadingHolder) holder;
             h.cover.setImageResource(coverRes);
@@ -100,9 +102,7 @@ public class LibraryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             h.sub.setText("Chương " + record.chapter + " · " + statusLabel);
             h.progress.setProgress(record.progress);
             h.action.setText("Đọc tiếp · " + record.progress + "% →");
-            h.itemView.setOnClickListener(v -> Toast.makeText(v.getContext(),
-                    "Mở trình đọc: " + novel.getName() + " (Chương " + record.chapter + ")",
-                    Toast.LENGTH_SHORT).show());
+            h.action.setOnClickListener(v -> listener.onOpenChapter(record.novelId, record.chapter));
 
         } else if (holder instanceof ShelfHolder) {
             ShelfHolder h = (ShelfHolder) holder;
@@ -133,7 +133,9 @@ public class LibraryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             h.arrow.setRotation(expanded ? 90f : 0f);
             h.chaptersContainer.setVisibility(expanded ? View.VISIBLE : View.GONE);
 
-            h.header.setOnClickListener(v -> {
+            h.header.setOnClickListener(v -> listener.onOpenNovel(record.novelId));
+            h.arrow.setContentDescription(expanded ? "Thu gọn chương đã lưu" : "Mở danh sách chương đã lưu");
+            h.arrow.setOnClickListener(v -> {
                 if (expandedBookmarkIds.contains(record.novelId)) {
                     expandedBookmarkIds.remove(record.novelId);
                 } else {
@@ -156,9 +158,7 @@ public class LibraryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     btnChapter.setLayoutParams(lp);
                     btnChapter.setText("Chương " + chapterNum);
                     btnChapter.setAllCaps(false);
-                    btnChapter.setOnClickListener(v -> Toast.makeText(v.getContext(),
-                            "Đọc " + novel.getName() + " - Chương " + chapterNum,
-                            Toast.LENGTH_SHORT).show());
+                    btnChapter.setOnClickListener(v -> listener.onOpenChapter(record.novelId, chapterNum));
 
                     ImageButton btnRemove = new ImageButton(h.itemView.getContext());
                     btnRemove.setImageResource(android.R.drawable.ic_menu_close_clear_cancel);
