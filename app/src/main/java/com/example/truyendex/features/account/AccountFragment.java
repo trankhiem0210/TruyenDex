@@ -51,11 +51,14 @@ public class AccountFragment extends Fragment {
 
         bindDisplayName(view, displayName);
         ((TextView) view.findViewById(R.id.textAccountEmail)).setText(email);
+        bindSignInMethod(view);
 
         view.findViewById(R.id.buttonEditDisplayName).setOnClickListener(
                 button -> showEditDisplayNameDialog(view, displayName));
-        view.findViewById(R.id.buttonChangePassword).setOnClickListener(
-                button -> showChangePasswordDialog());
+        View changePasswordButton = view.findViewById(R.id.buttonChangePassword);
+        if (authRepository.hasEmailPasswordProvider()) {
+            changePasswordButton.setOnClickListener(button -> showChangePasswordDialog());
+        }
 
         view.findViewById(R.id.buttonLogout).setOnClickListener(button -> {
             authRepository.signOut();
@@ -63,6 +66,36 @@ public class AccountFragment extends Fragment {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         });
+    }
+
+    private void bindSignInMethod(View root) {
+        boolean usesGoogle = authRepository.hasGoogleProvider();
+        boolean usesEmailPassword = authRepository.hasEmailPasswordProvider();
+
+        String signInMethod;
+        if (usesGoogle && usesEmailPassword) {
+            signInMethod = "Đăng nhập bằng Google và email/mật khẩu";
+        } else if (usesGoogle) {
+            signInMethod = "Đăng nhập bằng Google";
+        } else if (usesEmailPassword) {
+            signInMethod = "Đăng nhập bằng email/mật khẩu";
+        } else {
+            signInMethod = "Không xác định được phương thức đăng nhập";
+        }
+        ((TextView) root.findViewById(R.id.textSignInMethod)).setText(signInMethod);
+
+        TextView passwordInfo = root.findViewById(R.id.textPasswordManagementInfo);
+        View changePasswordButton = root.findViewById(R.id.buttonChangePassword);
+        if (usesEmailPassword) {
+            changePasswordButton.setVisibility(View.VISIBLE);
+            passwordInfo.setVisibility(View.GONE);
+        } else {
+            changePasswordButton.setVisibility(View.GONE);
+            passwordInfo.setVisibility(View.VISIBLE);
+            passwordInfo.setText(usesGoogle
+                    ? "Mật khẩu do Google quản lý. Hãy đổi mật khẩu trong tài khoản Google."
+                    : "Tài khoản này hiện không có mật khẩu để đổi trong ứng dụng.");
+        }
     }
 
     private String getFallbackDisplayName(String email) {

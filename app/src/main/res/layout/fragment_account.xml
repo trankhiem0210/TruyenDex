@@ -68,6 +68,15 @@
                     android:textSize="14sp" />
 
                 <TextView
+                    android:id="@+id/textSignInMethod"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Đăng nhập bằng email/mật khẩu"
+                    android:textColor="?attr/colorMuted"
+                    android:textSize="13sp" />
+
+                <TextView
                     android:id="@+id/buttonEditDisplayName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -113,6 +122,16 @@
                 android:text="Đổi mật khẩu"
                 android:textColor="?attr/colorInk"
                 android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/textPasswordManagementInfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:textColor="?attr/colorMuted"
+                android:textSize="14sp"
+                android:visibility="gone" />
         </LinearLayout>
 
         <Button

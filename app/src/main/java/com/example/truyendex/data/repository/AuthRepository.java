@@ -13,6 +13,8 @@ import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.auth.UserInfo;
 import com.google.firebase.auth.UserProfileChangeRequest;
 
 public class AuthRepository {
@@ -27,12 +29,38 @@ public class AuthRepository {
         return firebaseAuth.getCurrentUser();
     }
 
+    public boolean hasEmailPasswordProvider() {
+        return hasProvider(EmailAuthProvider.PROVIDER_ID);
+    }
+
+    public boolean hasGoogleProvider() {
+        return hasProvider(GoogleAuthProvider.PROVIDER_ID);
+    }
+
+    private boolean hasProvider(String providerId) {
+        FirebaseUser user = getCurrentUser();
+        if (user == null) {
+            return false;
+        }
+        for (UserInfo provider : user.getProviderData()) {
+            if (providerId.equals(provider.getProviderId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public Task<AuthResult> register(String email, String password) {
         return firebaseAuth.createUserWithEmailAndPassword(email, password);
     }
 
     public Task<AuthResult> signIn(String email, String password) {
         return firebaseAuth.signInWithEmailAndPassword(email, password);
+    }
+
+    public Task<AuthResult> signInWithGoogleToken(String idToken) {
+        AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
+        return firebaseAuth.signInWithCredential(credential);
     }
 
     public Task<Void> sendEmailVerification() {
@@ -101,7 +129,7 @@ public class AuthRepository {
 
     public static String getErrorMessage(Exception exception) {
         if (exception instanceof FirebaseAuthUserCollisionException) {
-            return "Email này đã được đăng ký.";
+            return "Email này đã được đăng ký. Hãy đăng nhập bằng phương thức đã dùng trước đó.";
         }
         if (exception instanceof FirebaseAuthWeakPasswordException) {
             return "Mật khẩu cần có ít nhất 6 ký tự.";
