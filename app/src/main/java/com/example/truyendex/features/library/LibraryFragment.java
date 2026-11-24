@@ -227,7 +227,7 @@ public class LibraryFragment extends Fragment {
             record.onShelf = shelfNovelIds.contains(record.novelId);
             record.history = recentNovelIds.contains(record.novelId);
             ReadingProgress progress = progressByNovel.get(record.novelId);
-            record.reading = progress != null && !progress.finished;
+            record.reading = record.history && progress != null && !progress.finished;
             if (progress != null) {
                 int total = db.getTotalChapters(record.novelId);
                 Novel novel = repository.getNovelById(record.novelId);

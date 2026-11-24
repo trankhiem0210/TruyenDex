@@ -528,7 +528,9 @@ public class AppDatabase extends SQLiteOpenHelper {
 
     public ReadingProgress getLatestUnfinishedReading() {
         try (Cursor cursor = getReadableDatabase().rawQuery(
-                READING_PROGRESS_COLUMNS + " WHERE finished = 0" + READING_PROGRESS_ORDER + " LIMIT 1", null)) {
+                READING_PROGRESS_COLUMNS + " WHERE finished = 0 " +
+                        "AND novel_id IN (SELECT novel_id FROM reading_history)" +
+                        READING_PROGRESS_ORDER + " LIMIT 1", null)) {
             return cursor.moveToFirst() ? readReadingProgress(cursor) : null;
         }
     }
