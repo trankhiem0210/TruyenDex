@@ -2,6 +2,7 @@ package com.example.truyendex.features.auth;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.CancellationSignal;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Patterns;
@@ -11,11 +12,22 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.credentials.Credential;
+import androidx.credentials.CredentialManager;
+import androidx.credentials.CredentialManagerCallback;
+import androidx.credentials.CustomCredential;
+import androidx.credentials.GetCredentialRequest;
+import androidx.credentials.GetCredentialResponse;
+import androidx.credentials.exceptions.GetCredentialCancellationException;
+import androidx.credentials.exceptions.GetCredentialException;
+
 import com.example.truyendex.MainActivity;
 import com.example.truyendex.R;
 import com.example.truyendex.core.ThemeManager;
 import com.example.truyendex.core.WindowInsetsHelper;
 import com.example.truyendex.data.repository.AuthRepository;
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption;
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential;
 
 public class LoginActivity extends Activity {
 
@@ -23,6 +35,7 @@ public class LoginActivity extends Activity {
     private EditText emailInput;
     private EditText passwordInput;
     private Button loginButton;
+    private Button googleSignInButton;
     private View verificationPanel;
     private TextView verificationMessage;
     private TextView resendVerificationButton;
@@ -38,12 +51,14 @@ public class LoginActivity extends Activity {
         emailInput = findViewById(R.id.editEmail);
         passwordInput = findViewById(R.id.editPassword);
         loginButton = findViewById(R.id.buttonLogin);
+        googleSignInButton = findViewById(R.id.buttonGoogleSignIn);
         verificationPanel = findViewById(R.id.verificationPanel);
         verificationMessage = findViewById(R.id.textVerificationMessage);
         resendVerificationButton = findViewById(R.id.textResendVerification);
         checkVerificationButton = findViewById(R.id.textCheckVerification);
 
         loginButton.setOnClickListener(view -> signIn());
+        googleSignInButton.setOnClickListener(view -> signInWithGoogle());
         findViewById(R.id.textCreateAccount).setOnClickListener(
                 view -> {
                     if (authRepository.getCurrentUser() != null
@@ -98,6 +113,75 @@ public class LoginActivity extends Activity {
                         Toast.makeText(
                                 this,
                                 AuthRepository.getErrorMessage(exception),
+                                Toast.LENGTH_LONG
+                        ).show();
+                    }
+                });
+    }
+
+    private void signInWithGoogle() {
+        setLoading(true);
+
+        GetGoogleIdOption googleIdOption = new GetGoogleIdOption.Builder()
+                .setFilterByAuthorizedAccounts(false)
+                .setServerClientId(getString(R.string.default_web_client_id))
+                .setAutoSelectEnabled(false)
+                .build();
+        GetCredentialRequest request = new GetCredentialRequest.Builder()
+                .addCredentialOption(googleIdOption)
+                .build();
+
+        CredentialManager credentialManager = CredentialManager.create(this);
+        credentialManager.getCredentialAsync(
+                this,
+                request,
+                new CancellationSignal(),
+                getMainExecutor(),
+                new CredentialManagerCallback<GetCredentialResponse, GetCredentialException>() {
+                    @Override
+                    public void onResult(GetCredentialResponse result) {
+                        handleGoogleCredential(result.getCredential());
+                    }
+
+                    @Override
+                    public void onError(GetCredentialException exception) {
+                        setLoading(false);
+                        if (!(exception instanceof GetCredentialCancellationException)) {
+                            Toast.makeText(
+                                    LoginActivity.this,
+                                    "Không thể chọn tài khoản Google. Vui lòng thử lại.",
+                                    Toast.LENGTH_LONG
+                            ).show();
+                        }
+                    }
+                }
+        );
+    }
+
+    private void handleGoogleCredential(Credential credential) {
+        if (!(credential instanceof CustomCredential)
+                || !GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL.equals(
+                        credential.getType())) {
+            setLoading(false);
+            Toast.makeText(
+                    this,
+                    "Loại thông tin đăng nhập Google không hợp lệ.",
+                    Toast.LENGTH_LONG
+            ).show();
+            return;
+        }
+
+        GoogleIdTokenCredential googleCredential =
+                GoogleIdTokenCredential.createFrom(((CustomCredential) credential).getData());
+        authRepository.signInWithGoogleToken(googleCredential.getIdToken())
+                .addOnCompleteListener(this, task -> {
+                    setLoading(false);
+                    if (task.isSuccessful()) {
+                        openMainScreen();
+                    } else {
+                        Toast.makeText(
+                                this,
+                                AuthRepository.getErrorMessage(task.getException()),
                                 Toast.LENGTH_LONG
                         ).show();
                     }
@@ -183,6 +267,7 @@ public class LoginActivity extends Activity {
     private void setLoading(boolean loading) {
         loginButton.setEnabled(!loading);
         loginButton.setText(loading ? "Đang đăng nhập..." : "Đăng nhập");
+        googleSignInButton.setEnabled(!loading);
     }
 
     private void openMainScreen() {

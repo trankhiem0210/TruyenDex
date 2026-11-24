@@ -12,7 +12,20 @@
           "package_name": "com.example.truyendex"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "340084747083-g9559hkcrbmkeku0bpmq3aemstpfj6po.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.truyendex",
+            "certificate_hash": "a816ddacda2c53752f60c5262e1ce31466fda70a"
+          }
+        },
+        {
+          "client_id": "340084747083-8le5uktioe6emd8rhv7tfdfd804g8f4h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDtY8k9sXHJwVLThrN6vGdJWlzBFk-P1u4"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "340084747083-8le5uktioe6emd8rhv7tfdfd804g8f4h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

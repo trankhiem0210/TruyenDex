@@ -124,6 +124,17 @@
             android:textSize="16sp"
             android:textStyle="bold" />
 
+        <Button
+            android:id="@+id/buttonGoogleSignIn"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="12dp"
+            android:backgroundTint="?attr/colorSurface"
+            android:text="Tiếp tục với Google"
+            android:textAllCaps="false"
+            android:textColor="?attr/colorInk"
+            android:textSize="16sp" />
+
         <LinearLayout
             android:id="@+id/verificationPanel"
             android:layout_width="match_parent"
