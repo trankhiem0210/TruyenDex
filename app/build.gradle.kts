@@ -46,4 +46,6 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
+    implementation(libs.room.runtime)
+    annotationProcessor(libs.room.compiler)
 }

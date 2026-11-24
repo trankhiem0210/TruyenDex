@@ -61,4 +61,13 @@
             android:textSize="@dimen/text_sm"
             android:textStyle="bold" />
     </LinearLayout>
+    <ImageButton
+        android:id="@+id/btnRemoveHistory"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="4dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/library_remove_history"
+        android:src="@android:drawable/ic_menu_delete"
+        android:visibility="gone" />
 </LinearLayout>

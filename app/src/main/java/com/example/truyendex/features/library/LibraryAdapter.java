@@ -36,6 +36,7 @@ public class LibraryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         void onSelectionChanged(int selectedCount);
         void onMarkSingleRead(int novelId);
         void onRemoveBookmark(int novelId, int chapter);
+        void onRemoveHistory(int novelId);
     }
 
     private final NovelRepository repository = NovelRepository.getInstance();
@@ -98,11 +99,14 @@ public class LibraryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             ReadingHolder h = (ReadingHolder) holder;
             h.cover.setImageResource(coverRes);
             h.title.setText(novel.getName());
-            String statusLabel = MODE_HISTORY.equals(mode) ? "Đã mở gần đây" : "Đang đọc";
+            boolean isHistory = MODE_HISTORY.equals(mode);
+            String statusLabel = isHistory ? "Đã mở gần đây" : "Đang đọc";
             h.sub.setText("Chương " + record.chapter + " · " + statusLabel);
             h.progress.setProgress(record.progress);
             h.action.setText("Đọc tiếp · " + record.progress + "% →");
             h.action.setOnClickListener(v -> listener.onOpenChapter(record.novelId, record.chapter));
+            h.removeHistory.setVisibility(isHistory ? View.VISIBLE : View.GONE);
+            h.removeHistory.setOnClickListener(isHistory ? v -> listener.onRemoveHistory(record.novelId) : null);
 
         } else if (holder instanceof ShelfHolder) {
             ShelfHolder h = (ShelfHolder) holder;
@@ -182,12 +186,14 @@ public class LibraryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     static class ReadingHolder extends RecyclerView.ViewHolder {
+        final View removeHistory;
         final ImageView cover;
         final TextView title, sub, action;
         final ProgressBar progress;
 
         ReadingHolder(@NonNull View itemView) {
             super(itemView);
+            removeHistory = itemView.findViewById(R.id.btnRemoveHistory);
             cover = itemView.findViewById(R.id.imgLibCover);
             title = itemView.findViewById(R.id.tvLibTitle);
             sub = itemView.findViewById(R.id.tvLibSub);

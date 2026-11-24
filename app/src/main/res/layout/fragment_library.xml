@@ -124,6 +124,16 @@
         </LinearLayout>
 
         <!-- ds the thu vien -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnClearHistory"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_gravity="end"
+            android:layout_marginBottom="@dimen/spacing_sm"
+            android:text="@string/library_clear_history"
+            android:visibility="gone" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvLibraryList"
             android:layout_width="match_parent"
