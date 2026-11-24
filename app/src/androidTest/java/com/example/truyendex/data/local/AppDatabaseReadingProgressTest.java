@@ -2,6 +2,7 @@ package com.example.truyendex.data.local;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
@@ -24,7 +25,7 @@ import java.util.UUID;
 @RunWith(AndroidJUnit4.class)
 public class AppDatabaseReadingProgressTest {
     @Test
-    public void upgradeAndRead_keepsProgressIndependentOfHistoryAndExcludesFinishedNovel() {
+    public void upgradeAndRead_removingHistoryHidesContinueReadingAndKeepsProgress() {
         Context target = InstrumentationRegistry.getInstrumentation().getTargetContext();
         String databaseName = "reading-test-" + UUID.randomUUID() + ".db";
         Context isolated = new ContextWrapper(target) {
@@ -64,20 +65,22 @@ public class AppDatabaseReadingProgressTest {
                 reopened.setOnShelf(4, true);
                 reopened.removeFromHistory(4);
                 assertEquals(Arrays.asList(8, 9), reopened.getReadHistoryNovelIds());
-                assertEquals(4, reopened.getLatestUnfinishedReading().novelId);
-                assertEquals(40, reopened.getLatestUnfinishedReading().chapterPercent);
+                assertEquals(8, reopened.getLatestUnfinishedReading().novelId);
+                assertEquals(40, reopened.getReadingProgress(4).chapterPercent);
                 assertTrue(reopened.isOnShelf(4));
 
                 reopened.saveCurrentChapter(4, 2);
-                assertEquals(40, reopened.getReadingProgress(4).chapterPercent);
+                assertEquals(4, reopened.getLatestUnfinishedReading().novelId);
+                assertEquals(40, reopened.getLatestUnfinishedReading().chapterPercent);
                 reopened.saveReadingScroll(4, 2, 100, true);
                 assertTrue(reopened.getReadingProgress(4).finished);
                 assertEquals(8, reopened.getLatestUnfinishedReading().novelId);
                 assertEquals(Integer.valueOf(4), reopened.getReadHistoryNovelIds().get(0));
 
-                reopened.markReadingFinished(Arrays.asList(8, 9));
                 reopened.clearReadingHistory();
                 assertEquals(Collections.emptyList(), reopened.getReadHistoryNovelIds());
+                assertNull(reopened.getLatestUnfinishedReading());
+                assertFalse(reopened.getReadingProgress(8).finished);
                 assertEquals(2, reopened.getCurrentChapter(4));
             }
         } finally {

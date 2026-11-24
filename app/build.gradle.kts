@@ -37,6 +37,7 @@ dependencies {
     implementation(libs.activity.ktx)
     implementation(libs.appcompat)
     implementation(libs.constraintlayout)
+    implementation(libs.googleid)
     implementation(libs.recyclerview)
     implementation(libs.material)
     implementation(libs.navigation.fragment.ktx)

@@ -74,9 +74,9 @@
     <string name="library_remove_history">Xóa truyện khỏi lịch sử</string>
     <string name="library_clear_history">Xóa toàn bộ</string>
     <string name="library_clear_history_title">Xóa toàn bộ lịch sử?</string>
-    <string name="library_clear_history_message">Thao tác này xóa danh sách truyện đã mở. Tiến độ đọc và bookmark vẫn được lưu.</string>
-    <string name="library_history_removed">Đã xóa truyện khỏi lịch sử.</string>
-    <string name="library_history_cleared">Đã xóa toàn bộ lịch sử.</string>
+    <string name="library_clear_history_message">Các truyện sẽ rời Lịch sử và Đang đọc. Chương đang đọc, vị trí cuộn, bookmark và kệ sách vẫn được lưu.</string>
+    <string name="library_history_removed">Đã xóa truyện khỏi Lịch sử và Đang đọc.</string>
+    <string name="library_history_cleared">Đã xóa toàn bộ Lịch sử và Đang đọc.</string>
     <string name="novel_follow">Theo dõi</string>
     <string name="novel_unfollow">Bỏ theo dõi</string>
     <string name="novel_follow_failed">Chưa cập nhật được theo dõi. Vui lòng thử lại.</string>
