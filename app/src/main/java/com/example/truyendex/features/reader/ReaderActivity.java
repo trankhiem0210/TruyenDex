@@ -14,19 +14,23 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.OneShotPreDrawListener;
 import com.google.android.material.button.MaterialButton;
 
 import com.example.truyendex.R;
 import com.example.truyendex.core.ThemeManager;
 import com.example.truyendex.data.repository.WalletRepository;
+import com.example.truyendex.data.repository.BookmarkRepository;
 import com.example.truyendex.features.wallet.WalletBottomSheet;
 import com.example.truyendex.data.local.AppDatabase;
 import com.example.truyendex.data.model.Chapter;
 import com.example.truyendex.data.model.Novel;
+import com.example.truyendex.data.model.ReadingProgress;
 import com.example.truyendex.data.repository.NovelRepository;
 import com.example.truyendex.features.novel.ChapterDropdown;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -36,8 +40,14 @@ public class ReaderActivity extends AppCompatActivity {
     private int currentChapter = 1;
     private int totalChapters = 18;
     private boolean toolsVisible = true;
+    private boolean canTrackScroll;
+    private int chapterPercent;
+    private int savedChapterPercent;
+    private OneShotPreDrawListener scrollRestore;
 
     private AppDatabase db;
+    private BookmarkRepository bookmarks;
+    private List<Integer> bookmarkedChapters = Collections.emptyList();
     private WalletRepository wallet;
     private SharedPreferences prefs;
 
@@ -82,6 +92,11 @@ public class ReaderActivity extends AppCompatActivity {
                 (key, result) -> loadChapter(currentChapter));
         if (savedInstanceState != null) currentChapter = savedInstanceState.getInt("reader_chapter", currentChapter);
         bindViews();
+        bookmarks = new BookmarkRepository(this);
+        bookmarks.observeChapters(novelId).observe(this, chapters -> {
+            bookmarkedChapters = chapters;
+            updateBookmarkUI();
+        });
         tts = new TtsController(this, paragraphs, (playing, index, status) -> {
             btnTtsPlayPause.setText(playing ? "Tạm dừng" : "Phát");
             ((MaterialButton) btnTtsPlayPause).setIconResource(playing
@@ -137,14 +152,7 @@ public class ReaderActivity extends AppCompatActivity {
         btnShowTools.setOnClickListener(v -> setToolsVisible(true));
         readerContentBox.setOnClickListener(v -> setToolsVisible(!toolsVisible));
 
-        scrollReader.setOnScrollChangeListener((view, x, y, oldX, oldY) -> {
-            View child = scrollReader.getChildAt(0);
-            if (child == null) return;
-            int max = child.getHeight() - scrollReader.getHeight();
-            int percent = max > 0 ? Math.min(100, Math.max(0, (y * 100) / max)) : 100;
-            tvReadPercent.setText(percent + "%");
-            if (percent >= 98) db.markChapterRead(novelId, currentChapter);
-        });
+        scrollReader.setOnScrollChangeListener((view, x, y, oldX, oldY) -> updateReadingScroll(y));
 
         btnPrevChap.setOnClickListener(v -> {
             if (currentChapter > 1) loadChapter(currentChapter - 1);
@@ -167,11 +175,17 @@ public class ReaderActivity extends AppCompatActivity {
         findViewById(R.id.btnFontTheme).setOnClickListener(v -> showFontAndThemeDialog());
 
         btnBookmark.setOnClickListener(v -> {
-            db.toggleBookmark(novelId, currentChapter);
-            updateBookmarkUI();
-            Toast.makeText(this, db.isBookmarked(novelId, currentChapter)
-                    ? "Đã đánh dấu chương " + currentChapter
-                    : "Đã bỏ đánh dấu", Toast.LENGTH_SHORT).show();
+            int chapter = currentChapter;
+            bookmarks.toggle(novelId, chapter, saved -> {
+                if (isFinishing() || isDestroyed()) return;
+                if (chapter == currentChapter) renderBookmarkButton(saved);
+                int message = saved ? R.string.bookmark_added : R.string.bookmark_removed;
+                Toast.makeText(this, getString(message, chapter), Toast.LENGTH_SHORT).show();
+            }, () -> {
+                if (!isFinishing() && !isDestroyed()) {
+                    Toast.makeText(this, R.string.bookmark_update_failed, Toast.LENGTH_SHORT).show();
+                }
+            });
         });
 
         findViewById(R.id.btnUnlockOne).setOnClickListener(v -> {
@@ -219,20 +233,25 @@ public class ReaderActivity extends AppCompatActivity {
 
     // tai noi dung chuong va kiem tra mo khoa
     private void loadChapter(int chapterNumber) {
-        boolean changedChapter = chapterNumber != currentChapter;
-        ((ChapterDropdown) findViewById(R.id.chapterDropdown)).collapse();
-        tts.stop();
-        currentChapter = chapterNumber;
-        db.saveCurrentChapter(novelId, chapterNumber);
-
         Chapter chapter = db.getChapterByNumber(novelId, chapterNumber);
         if (chapter == null) {
             Toast.makeText(this, "Chưa có dữ liệu chương " + chapterNumber + " trong database", Toast.LENGTH_SHORT).show();
             return;
         }
 
+        persistReadingScroll();
+        canTrackScroll = false;
+        if (scrollRestore != null) scrollRestore.removeListener();
+        boolean changedChapter = chapterNumber != currentChapter;
+        ((ChapterDropdown) findViewById(R.id.chapterDropdown)).collapse();
+        tts.stop();
+        currentChapter = chapterNumber;
+        db.saveCurrentChapter(novelId, chapterNumber);
+
         boolean allowed = wallet.isUnlocked(novelId, chapterNumber, chapter.isPaid());
-        if (allowed) db.markChapterRead(novelId, chapterNumber);
+        ReadingProgress progress = db.getReadingProgress(novelId);
+        savedChapterPercent = progress == null ? 0 : progress.chapterPercent;
+        chapterPercent = savedChapterPercent;
 
         Novel novel = db.getNovelByIdFromDb(novelId);
         if (novel == null) {
@@ -301,16 +320,50 @@ public class ReaderActivity extends AppCompatActivity {
 
         updateBookmarkUI();
         scrollReader.scrollTo(0, 0);
+        boolean readableContent = allowed && !paragraphs.isEmpty();
+        tvReadPercent.setText((readableContent ? chapterPercent : 0) + "%");
+        if (readableContent) {
+            scrollRestore = OneShotPreDrawListener.add(scrollReader, () -> {
+                scrollRestore = null;
+                int range = getReadingScrollRange();
+                scrollReader.scrollTo(0, Math.round(range * chapterPercent / 100f));
+                canTrackScroll = true;
+                if (range == 0) updateReadingScroll(0);
+            });
+        }
         if (changedChapter) {
             readerContentBox.animate().cancel();
             readerContentBox.setAlpha(0.55f);
             readerContentBox.animate().alpha(1f).setDuration(150).start();
         }
-        tvReadPercent.setText("0%");
+    }
+
+    private int getReadingScrollRange() {
+        int viewport = scrollReader.getHeight() - scrollReader.getPaddingTop() - scrollReader.getPaddingBottom();
+        return Math.max(0, readerContentBox.getHeight() - viewport);
+    }
+
+    private void updateReadingScroll(int scrollY) {
+        if (!canTrackScroll) return;
+        int range = getReadingScrollRange();
+        chapterPercent = range == 0 ? 100 : Math.max(0, Math.min(100, scrollY * 100 / range));
+        tvReadPercent.setText(chapterPercent + "%");
+        if (chapterPercent == 100) persistReadingScroll();
+    }
+
+    private void persistReadingScroll() {
+        if (!canTrackScroll || chapterPercent == savedChapterPercent) return;
+        boolean lastChapter = currentChapter == totalChapters;
+        db.saveReadingScroll(novelId, currentChapter, chapterPercent, lastChapter);
+        if (chapterPercent == 100) db.markChapterRead(novelId, currentChapter);
+        savedChapterPercent = chapterPercent;
     }
 
     private void updateBookmarkUI() {
-        boolean saved = db.isBookmarked(novelId, currentChapter);
+        renderBookmarkButton(bookmarkedChapters.contains(currentChapter));
+    }
+
+    private void renderBookmarkButton(boolean saved) {
         btnBookmark.setText(saved ? "Đã lưu" : "Lưu");
         ((MaterialButton) btnBookmark).setIconResource(saved
                 ? android.R.drawable.btn_star_big_on : android.R.drawable.btn_star_big_off);
@@ -360,7 +413,14 @@ public class ReaderActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onPause() {
+        persistReadingScroll();
+        super.onPause();
+    }
+
+    @Override
     protected void onDestroy() {
+        if (scrollRestore != null) scrollRestore.removeListener();
         tts.close();
         db.close();
         super.onDestroy();

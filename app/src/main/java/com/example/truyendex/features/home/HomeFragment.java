@@ -1,11 +1,14 @@
 package com.example.truyendex.features.home;
 
+import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -13,6 +16,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -25,7 +30,9 @@ import com.example.truyendex.core.ThemeManager;
 import com.example.truyendex.data.local.AppDatabase;
 import com.example.truyendex.data.model.Chapter;
 import com.example.truyendex.data.model.Novel;
+import com.example.truyendex.data.model.ReadingProgress;
 import com.example.truyendex.data.repository.NovelRepository;
+import com.example.truyendex.features.reader.ReaderActivity;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
@@ -37,14 +44,13 @@ import java.util.Locale;
 
 public class HomeFragment extends Fragment {
 
-    private static final int CONTINUE_NOVEL_ID = 1;
     private static final String RANKING_BUTTON = "rankingButton";
     private static final String SELECTED_GENRE = "selectedGenre";
     private static final String SHOW_ALL_STORIES = "showAllStories";
 
     private final NovelRepository repository = NovelRepository.getInstance();
     private AppDatabase db;
-    private int continueNovelId = CONTINUE_NOVEL_ID;
+    private ReadingProgress continueReading;
     private int rankingButton = R.id.homeRankWeek;
     private String selectedGenre;
     private boolean showAllStories;
@@ -86,13 +92,23 @@ public class HomeFragment extends Fragment {
 
     // hien thi thong tin truyen dang doc do tren trang chu
     private void loadContinueCard(View view) {
-        List<Integer> historyIds = db.getReadHistoryNovelIds();
-        continueNovelId = historyIds.isEmpty() ? CONTINUE_NOVEL_ID : historyIds.get(0);
+        continueReading = db.getLatestUnfinishedReading();
+        View card = view.findViewById(R.id.continueCard);
+        View heading = view.findViewById(R.id.continueHeading);
+        if (continueReading == null) {
+            card.setVisibility(View.GONE);
+            heading.setVisibility(View.GONE);
+            return;
+        }
+        int continueNovelId = continueReading.novelId;
 
         Novel continueNovel = db.getNovelByIdFromDb(continueNovelId);
         if (continueNovel == null) {
             continueNovel = repository.getNovelById(continueNovelId);
         }
+        int visibility = continueNovel == null ? View.GONE : View.VISIBLE;
+        card.setVisibility(visibility);
+        heading.setVisibility(visibility);
         if (continueNovel == null) return;
 
         HomeAdapter.bindCover(view.findViewById(R.id.continueCover), continueNovel.getCoverImageResId());
@@ -104,7 +120,7 @@ public class HomeFragment extends Fragment {
 
         tvTitle.setText(continueNovel.getName());
 
-        int currentCh = db.getCurrentChapter(continueNovelId);
+        int currentCh = continueReading.chapter;
         int totalCh = db.getTotalChapters(continueNovelId);
         if (totalCh <= 0) totalCh = continueNovel.getChapters();
 
@@ -115,9 +131,7 @@ public class HomeFragment extends Fragment {
             tvChapter.setText("Chương " + currentCh);
         }
 
-        // tinh phan tram tien do doc
-        int percent = totalCh > 0 ? (currentCh * 100) / totalCh : 0;
-        if (percent < 1) percent = 1;
+        int percent = continueReading.novelPercent(totalCh);
         progressBar.setProgress(percent);
         btnContinue.setText(getString(R.string.read_continue, percent));
     }
@@ -157,21 +171,47 @@ public class HomeFragment extends Fragment {
                     .show();
         });
         view.findViewById(R.id.btnToc).setOnClickListener(button -> {
-            int currentCh = db != null ? db.getCurrentChapter(continueNovelId) : 1;
-            Chapter ch = db != null ? db.getChapterByNumber(continueNovelId, currentCh) : null;
-            String label = (ch != null && ch.getTitle() != null && !ch.getTitle().isEmpty())
-                    ? ch.getTitle()
-                    : getString(R.string.home_continue_chapter);
+            ReadingProgress progress = continueReading;
+            if (progress == null) return;
+            int novelId = progress.novelId;
+            List<Integer> chapterNumbers = new ArrayList<>();
+            List<String> labels = new ArrayList<>();
+            try (Cursor chapters = db.chapterList(novelId)) {
+                int numberColumn = chapters.getColumnIndexOrThrow("chapter_number");
+                int titleColumn = chapters.getColumnIndexOrThrow("title");
+                while (chapters.moveToNext()) {
+                    int number = chapters.getInt(numberColumn);
+                    String title = chapters.getString(titleColumn);
+                    chapterNumbers.add(number);
+                    labels.add(title == null || title.isEmpty()
+                            ? getString(R.string.home_chapter_number, number) : title);
+                }
+            }
+            if (labels.isEmpty()) {
+                int chapter = progress.chapter;
+                chapterNumbers.add(chapter);
+                labels.add(getString(R.string.home_chapter_number, chapter));
+            }
             new MaterialAlertDialogBuilder(requireContext())
                     .setTitle(R.string.table_of_contents)
-                    .setItems(new CharSequence[]{label},
-                            (dialog, position) -> openNovelDetail(view, repository.getNovelById(continueNovelId)))
+                    .setItems(labels.toArray(new String[0]),
+                            (dialog, position) -> openReader(novelId, chapterNumbers.get(position)))
                     .show();
         });
-        view.findViewById(R.id.btnContinueReading).setOnClickListener(button ->
-                openNovelDetail(view, repository.getNovelById(continueNovelId)));
-        view.findViewById(R.id.continueCover).setOnClickListener(button ->
-                openNovelDetail(view, repository.getNovelById(continueNovelId)));
+        view.findViewById(R.id.btnContinueReading).setOnClickListener(button -> {
+            ReadingProgress progress = continueReading;
+            if (progress != null) openReader(progress.novelId, progress.chapter);
+        });
+        view.findViewById(R.id.continueCover).setOnClickListener(button -> {
+            ReadingProgress progress = continueReading;
+            if (progress != null) openNovelDetail(view, repository.getNovelById(progress.novelId));
+        });
+    }
+
+    private void openReader(int novelId, int chapter) {
+        startActivity(new Intent(requireContext(), ReaderActivity.class)
+                .putExtra("novel_id", novelId)
+                .putExtra("chapter_number", chapter));
     }
 
     private void setupFeatured(View view) {
@@ -261,6 +301,12 @@ public class HomeFragment extends Fragment {
 
     private void setupSearch(View view) {
         EditText search = view.findViewById(R.id.homeSearch);
+        search.setOnEditorActionListener((input, actionId, event) -> {
+            if (actionId != EditorInfo.IME_ACTION_DONE) return false;
+            WindowCompat.getInsetsController(requireActivity().getWindow(), input)
+                    .hide(WindowInsetsCompat.Type.ime());
+            return true;
+        });
         search.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence text, int start, int count, int after) {}

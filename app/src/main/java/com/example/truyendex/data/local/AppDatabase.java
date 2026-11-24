@@ -5,10 +5,16 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.example.truyendex.data.model.Chapter;
 import com.example.truyendex.data.model.Novel;
+import com.example.truyendex.data.model.ReadingProgress;
 import com.example.truyendex.data.repository.NovelRepository;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -16,25 +22,97 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 // quan ly sqlite luu truyen, chuong va tien do doc
 public class AppDatabase extends SQLiteOpenHelper {
     private static final String DB_NAME = "truyendex.db";
-    private static final int DB_VERSION = 2;
+    private static final int DB_VERSION = 5;
+    private static final String READING_PROGRESS_COLUMNS =
+            "SELECT novel_id, current_chapter, chapter_percent, finished FROM reading_progress";
+    private static final String READING_PROGRESS_ORDER = " ORDER BY updated_at DESC, novel_id DESC";
+    private final Context context;
 
     public AppDatabase(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
+        this.context = context.getApplicationContext();
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         createTables(db);
+        importLegacyLibraryBookmarks(db);
+        importLibraryState(db);
+        upgradeReadingProgress(db);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         createTables(db);
+        if (oldVersion < 3) {
+            importLegacyLibraryBookmarks(db);
+        }
+        if (oldVersion < 4 && newVersion >= 4) {
+            importLibraryState(db);
+        }
+        if (oldVersion < 5 && newVersion >= 5) {
+            upgradeReadingProgress(db);
+        }
+    }
+
+    private void upgradeReadingProgress(SQLiteDatabase db) {
+        db.execSQL("ALTER TABLE reading_progress ADD COLUMN chapter_percent INTEGER NOT NULL DEFAULT 0");
+        db.execSQL("ALTER TABLE reading_progress ADD COLUMN finished INTEGER NOT NULL DEFAULT 0");
+        db.execSQL("ALTER TABLE reading_progress ADD COLUMN updated_at INTEGER NOT NULL DEFAULT 0");
+        db.execSQL("UPDATE reading_progress SET updated_at = COALESCE((" +
+                "SELECT last_opened FROM reading_history " +
+                "WHERE reading_history.novel_id = reading_progress.novel_id), 0)");
+    }
+
+    private JSONArray readLegacyLibraryRecords() {
+        String records = context.getSharedPreferences("truyendex-library-v1", Context.MODE_PRIVATE)
+                .getString("records", null);
+        try {
+            return records == null ? new JSONArray() : new JSONArray(records);
+        } catch (JSONException e) {
+            Log.w("AppDatabase", "Cannot read legacy library records", e);
+            return new JSONArray();
+        }
+    }
+
+    private void importLegacyLibraryBookmarks(SQLiteDatabase db) {
+        JSONArray library = readLegacyLibraryRecords();
+        for (int i = 0; i < library.length(); i++) {
+            JSONObject record = library.optJSONObject(i);
+            if (record == null) continue;
+            int novelId = record.optInt("novelId");
+            JSONArray bookmarks = record.optJSONArray("bookmarks");
+            if (novelId <= 0 || bookmarks == null) continue;
+            for (int j = 0; j < bookmarks.length(); j++) {
+                int chapter = bookmarks.optInt(j);
+                if (chapter > 0) insertBookmark(db, novelId, chapter);
+            }
+        }
+    }
+
+    private void importLibraryState(SQLiteDatabase db) {
+        db.execSQL("INSERT OR IGNORE INTO reading_history (novel_id, last_opened) " +
+                "SELECT novel_id, 0 FROM reading_progress");
+        JSONArray library = readLegacyLibraryRecords();
+        for (int i = 0; i < library.length(); i++) {
+            JSONObject record = library.optJSONObject(i);
+            if (record == null || record.optInt("novelId") <= 0) continue;
+            int novelId = record.optInt("novelId");
+            if (record.optBoolean("onShelf")) {
+                db.execSQL("INSERT OR IGNORE INTO library_shelf (novel_id) VALUES (?)", new Object[]{novelId});
+            }
+            if (record.optBoolean("history")) {
+                db.execSQL("INSERT OR IGNORE INTO reading_history (novel_id, last_opened) VALUES (?, 0)",
+                        new Object[]{novelId});
+            }
+        }
     }
 
     @Override
@@ -67,6 +145,9 @@ public class AppDatabase extends SQLiteOpenHelper {
                 "novel_id INTEGER, " +
                 "chapter_number INTEGER, " +
                 "PRIMARY KEY (novel_id, chapter_number))");
+        db.execSQL("CREATE TABLE IF NOT EXISTS library_shelf (novel_id INTEGER PRIMARY KEY)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS reading_history (" +
+                "novel_id INTEGER PRIMARY KEY, last_opened INTEGER NOT NULL)");
         db.execSQL("CREATE TABLE IF NOT EXISTS novels (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "name TEXT, " +
@@ -303,21 +384,73 @@ public class AppDatabase extends SQLiteOpenHelper {
     }
     public int getCurrentChapter(int novelId) {
         SQLiteDatabase db = getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT current_chapter FROM reading_progress WHERE novel_id = ?",
-                new String[]{String.valueOf(novelId)});
-        int ch = 1;
-        if (c != null && c.moveToFirst()) {
-            ch = c.getInt(0);
-            c.close();
+        try (Cursor c = db.rawQuery("SELECT current_chapter FROM reading_progress WHERE novel_id = ?",
+                new String[]{String.valueOf(novelId)})) {
+            return c.moveToFirst() ? c.getInt(0) : 1;
         }
-        return ch;
     }
     public void saveCurrentChapter(int novelId, int chapterNumber) {
         SQLiteDatabase db = getWritableDatabase();
-        ContentValues cv = new ContentValues();
-        cv.put("novel_id", novelId);
-        cv.put("current_chapter", chapterNumber);
-        db.insertWithOnConflict("reading_progress", null, cv, SQLiteDatabase.CONFLICT_REPLACE);
+        long now = System.currentTimeMillis();
+        db.beginTransaction();
+        try {
+            db.execSQL("INSERT OR IGNORE INTO reading_progress (novel_id, current_chapter) VALUES (?, ?)",
+                    new Object[]{novelId, chapterNumber});
+            db.execSQL("UPDATE reading_progress SET " +
+                            "chapter_percent = CASE WHEN current_chapter = ? THEN chapter_percent ELSE 0 END, " +
+                            "current_chapter = ?, updated_at = ? WHERE novel_id = ?",
+                    new Object[]{chapterNumber, chapterNumber, now, novelId});
+            db.execSQL("INSERT OR REPLACE INTO reading_history (novel_id, last_opened) VALUES (?, ?)",
+                    new Object[]{novelId, now});
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+    public void saveReadingScroll(int novelId, int chapterNumber, int percent, boolean lastChapter) {
+        SQLiteDatabase db = getWritableDatabase();
+        db.execSQL("UPDATE reading_progress SET chapter_percent = ?, updated_at = ?, " +
+                        "finished = CASE WHEN ? THEN 1 ELSE finished END " +
+                        "WHERE novel_id = ? AND current_chapter = ?",
+                new Object[]{percent, System.currentTimeMillis(), lastChapter && percent == 100 ? 1 : 0,
+                        novelId, chapterNumber});
+    }
+
+    public void markReadingFinished(List<Integer> novelIds) {
+        SQLiteDatabase db = getWritableDatabase();
+        db.beginTransaction();
+        try {
+            for (int novelId : novelIds) {
+                db.execSQL("UPDATE reading_progress SET finished = 1 WHERE novel_id = ?", new Object[]{novelId});
+            }
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+    public ReadingProgress getReadingProgress(int novelId) {
+        try (Cursor cursor = getReadableDatabase().rawQuery(
+                READING_PROGRESS_COLUMNS + " WHERE novel_id = ?", new String[]{String.valueOf(novelId)})) {
+            return cursor.moveToFirst() ? readReadingProgress(cursor) : null;
+        }
+    }
+
+    public Map<Integer, ReadingProgress> getReadingProgressByNovel() {
+        Map<Integer, ReadingProgress> progressByNovel = new LinkedHashMap<>();
+        try (Cursor cursor = getReadableDatabase().rawQuery(
+                READING_PROGRESS_COLUMNS + READING_PROGRESS_ORDER, null)) {
+            while (cursor.moveToNext()) {
+                ReadingProgress progress = readReadingProgress(cursor);
+                progressByNovel.put(progress.novelId, progress);
+            }
+        }
+        return progressByNovel;
+    }
+
+    private ReadingProgress readReadingProgress(Cursor cursor) {
+        return new ReadingProgress(cursor.getInt(0), cursor.getInt(1), cursor.getInt(2), cursor.getInt(3) != 0);
     }
     public boolean isChapterRead(int novelId, int chapterNumber) {
         SQLiteDatabase db = getReadableDatabase();
@@ -342,27 +475,99 @@ public class AppDatabase extends SQLiteOpenHelper {
         if (c != null) c.close();
         return exists;
     }
-    public void toggleBookmark(int novelId, int chapterNumber) {
+    public boolean toggleBookmark(int novelId, int chapterNumber) {
         SQLiteDatabase db = getWritableDatabase();
-        if (isBookmarked(novelId, chapterNumber)) {
-            db.delete("bookmarks", "novel_id = ? AND chapter_number = ?",
-                    new String[]{String.valueOf(novelId), String.valueOf(chapterNumber)});
-        } else {
-            ContentValues cv = new ContentValues();
-            cv.put("novel_id", novelId);
-            cv.put("chapter_number", chapterNumber);
-            db.insert("bookmarks", null, cv);
+        db.beginTransaction();
+        try {
+            boolean bookmarked = deleteBookmark(db, novelId, chapterNumber) == 0;
+            if (bookmarked) {
+                insertBookmark(db, novelId, chapterNumber);
+            }
+            db.setTransactionSuccessful();
+            return bookmarked;
+        } finally {
+            db.endTransaction();
         }
     }
-    public List<Integer> getReadHistoryNovelIds() {
-        List<Integer> list = new ArrayList<>();
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT novel_id FROM reading_progress ORDER BY novel_id DESC", null);
-        if (c != null) {
-            while (c.moveToNext()) {
-                list.add(c.getInt(0));
+
+    public void removeBookmark(int novelId, int chapterNumber) {
+        deleteBookmark(getWritableDatabase(), novelId, chapterNumber);
+    }
+
+    private int deleteBookmark(SQLiteDatabase db, int novelId, int chapterNumber) {
+        return db.delete("bookmarks", "novel_id = ? AND chapter_number = ?",
+                new String[]{String.valueOf(novelId), String.valueOf(chapterNumber)});
+    }
+
+    private void insertBookmark(SQLiteDatabase db, int novelId, int chapterNumber) {
+        ContentValues values = new ContentValues();
+        values.put("novel_id", novelId);
+        values.put("chapter_number", chapterNumber);
+        db.insertWithOnConflict("bookmarks", null, values, SQLiteDatabase.CONFLICT_IGNORE);
+    }
+
+    public Map<Integer, List<Integer>> getBookmarksByNovel() {
+        Map<Integer, List<Integer>> bookmarks = new LinkedHashMap<>();
+        try (Cursor cursor = getReadableDatabase().rawQuery(
+                "SELECT novel_id, chapter_number FROM bookmarks ORDER BY novel_id, chapter_number", null)) {
+            while (cursor.moveToNext()) {
+                bookmarks.computeIfAbsent(cursor.getInt(0), id -> new ArrayList<>()).add(cursor.getInt(1));
             }
-            c.close();
+        }
+        return bookmarks;
+    }
+
+    public List<Integer> getReadHistoryNovelIds() {
+        return queryNovelIds("SELECT novel_id FROM reading_history ORDER BY last_opened DESC, novel_id DESC");
+    }
+
+    public int getMostRecentlyReadNovelId(int fallbackNovelId) {
+        ReadingProgress progress = getLatestUnfinishedReading();
+        return progress == null ? fallbackNovelId : progress.novelId;
+    }
+
+    public ReadingProgress getLatestUnfinishedReading() {
+        try (Cursor cursor = getReadableDatabase().rawQuery(
+                READING_PROGRESS_COLUMNS + " WHERE finished = 0" + READING_PROGRESS_ORDER + " LIMIT 1", null)) {
+            return cursor.moveToFirst() ? readReadingProgress(cursor) : null;
+        }
+    }
+
+    public List<Integer> getShelfNovelIds() {
+        return queryNovelIds("SELECT novel_id FROM library_shelf ORDER BY novel_id");
+    }
+
+    public boolean isOnShelf(int novelId) {
+        try (Cursor cursor = getReadableDatabase().rawQuery(
+                "SELECT 1 FROM library_shelf WHERE novel_id = ?", new String[]{String.valueOf(novelId)})) {
+            return cursor.moveToFirst();
+        }
+    }
+
+    public void setOnShelf(int novelId, boolean onShelf) {
+        SQLiteDatabase db = getWritableDatabase();
+        if (onShelf) {
+            db.execSQL("INSERT OR IGNORE INTO library_shelf (novel_id) VALUES (?)", new Object[]{novelId});
+        } else {
+            db.delete("library_shelf", "novel_id = ?", new String[]{String.valueOf(novelId)});
+        }
+    }
+
+    public void removeFromHistory(int novelId) {
+        getWritableDatabase().delete("reading_history", "novel_id = ?",
+                new String[]{String.valueOf(novelId)});
+    }
+
+    public void clearReadingHistory() {
+        getWritableDatabase().delete("reading_history", null, null);
+    }
+
+    private List<Integer> queryNovelIds(String sql) {
+        List<Integer> list = new ArrayList<>();
+        try (Cursor cursor = getReadableDatabase().rawQuery(sql, null)) {
+            while (cursor.moveToNext()) {
+                list.add(cursor.getInt(0));
+            }
         }
         return list;
     }
@@ -373,18 +578,7 @@ public class AppDatabase extends SQLiteOpenHelper {
         Cursor c = db.rawQuery("SELECT id, name, author, genres, chapters, status, type, views FROM novels", null);
         if (c != null) {
             while (c.moveToNext()) {
-                int id = c.getInt(0);
-                String name = c.getString(1);
-                String author = c.getString(2);
-                String genresStr = c.getString(3);
-                int chapters = c.getInt(4);
-                String status = c.getString(5);
-                String type = c.getString(6);
-                int views = c.getInt(7);
-                List<String> genreList = Arrays.asList(genresStr.split(","));
-                list.add(new Novel(
-                        id, name, author, "", genreList, chapters, status, type, 0, 1, views, views, views
-                ));
+                list.add(readNovel(c));
             }
             c.close();
         }
@@ -398,22 +592,25 @@ public class AppDatabase extends SQLiteOpenHelper {
         Novel novel = null;
         if (c != null) {
             if (c.moveToFirst()) {
-                int id = c.getInt(0);
-                String name = c.getString(1);
-                String author = c.getString(2);
-                String genresStr = c.getString(3);
-                int chapters = c.getInt(4);
-                String status = c.getString(5);
-                String type = c.getString(6);
-                int views = c.getInt(7);
-                List<String> genreList = Arrays.asList(genresStr.split(","));
-                novel = new Novel(
-                        id, name, author, "", genreList, chapters, status, type, 0, 1, views, views, views
-                );
+                novel = readNovel(c);
             }
             c.close();
         }
         return novel;
+    }
+
+    private Novel readNovel(Cursor cursor) {
+        int id = cursor.getInt(0);
+        String name = cursor.getString(1);
+        String author = cursor.getString(2);
+        List<String> genres = Arrays.asList(cursor.getString(3).split(","));
+        int chapters = cursor.getInt(4);
+        String status = cursor.getString(5);
+        String type = cursor.getString(6);
+        int views = cursor.getInt(7);
+        int coverResId = NovelRepository.getInstance().getSampleCoverImageResId(name);
+        return new Novel(id, name, author, "", genres, chapters, status, type,
+                coverResId, 1, views, views, views);
     }
 
 }

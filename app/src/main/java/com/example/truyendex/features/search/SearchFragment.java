@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.HorizontalScrollView;
@@ -16,6 +17,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -82,6 +85,12 @@ public class SearchFragment extends Fragment {
         rvGrid.setLayoutManager(new GridLayoutManager(requireContext(), 2));
         rvGrid.setAdapter(adapter);
 
+        edtQuery.setOnEditorActionListener((input, actionId, event) -> {
+            if (actionId != EditorInfo.IME_ACTION_SEARCH) return false;
+            WindowCompat.getInsetsController(requireActivity().getWindow(), input)
+                    .hide(WindowInsetsCompat.Type.ime());
+            return true;
+        });
         edtQuery.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
